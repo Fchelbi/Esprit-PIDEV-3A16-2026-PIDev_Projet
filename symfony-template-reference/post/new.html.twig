@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}New Post{% endblock %}
+
+{% block content %}
+<div class="form-container glassmorphism">
+    <h1 class="page-title">Create new Post</h1>
+
+    {{ include('post/_form.html.twig') }}
+
+    <div style="margin-top:1.2rem;">
+        <a href="{{ path('app_post_index') }}" class="btn btn-secondary" style="gap:0.4rem;">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

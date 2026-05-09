@@ -1,0 +1,82 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Moderation Center{% endblock %}
+
+{% block content %}
+<div class="moderation-container">
+    <h1 class="page-title">Moderation Center</h1>
+
+    <!-- Posts Section -->
+    <div style="margin-top:1.5rem;">
+        <h2 class="moderation-section-title">
+            <i data-lucide="file-text"></i>
+            Posts ({{ posts|length }})
+        </h2>
+
+        <div class="moderation-list">
+            {% for post in posts %}
+                <div class="moderation-item glassmorphism" style="animation-delay:{{ loop.index * 0.05 }}s;">
+                    <div class="moderation-item-content">
+                        <h3>{{ post.title }}</h3>
+                        <p class="meta">
+                            by <strong>{{ post.user.prenom }} {{ post.user.nom }}</strong> · {{ post.createdAt|date('M j, Y') }}
+                        </p>
+                        <p class="preview">{{ post.content|length > 120 ? post.content|slice(0,120) ~ '...' : post.content }}</p>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+                        <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-icon btn-action" data-tooltip="View">
+                            <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                        </a>
+                        <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" style="display:inline;" onsubmit="return confirm('Delete this post?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                            <button type="submit" class="btn btn-icon btn-danger" data-tooltip="Delete">
+                                <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state glassmorphism" style="padding:2rem;">
+                    <i data-lucide="check-circle" style="width:40px;height:40px;color:var(--accent);margin-bottom:0.8rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                    <p style="color:var(--text-muted);margin:0;">No posts to moderate</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-color);">
+        <h2 class="moderation-section-title">
+            <i data-lucide="message-circle"></i>
+            Comments ({{ comments|length }})
+        </h2>
+
+        <div class="moderation-list">
+            {% for comment in comments %}
+                <div class="moderation-item glassmorphism" style="animation-delay:{{ loop.index * 0.05 }}s;">
+                    <div class="moderation-item-content">
+                        <p class="meta" style="margin-bottom:0.4rem;">
+                            <strong>{{ comment.user.prenom }} {{ comment.user.nom }}</strong> · {{ comment.createdAt|date('M j, Y') }}
+                        </p>
+                        <p style="margin:0 0 0.4rem 0;color:var(--text-main);font-size:0.9rem;">{{ comment.content|length > 120 ? comment.content|slice(0,120) ~ '...' : comment.content }}</p>
+                        <p style="margin:0;color:var(--text-subtle);font-size:0.8rem;">
+                            on: <em>{{ comment.post.title }}</em>
+                        </p>
+                    </div>
+                    <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" style="display:inline;flex-shrink:0;" onsubmit="return confirm('Delete this comment?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                        <button type="submit" class="btn btn-icon btn-danger" data-tooltip="Delete">
+                            <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="empty-state glassmorphism" style="padding:2rem;">
+                    <i data-lucide="check-circle" style="width:40px;height:40px;color:var(--accent);margin-bottom:0.8rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                    <p style="color:var(--text-muted);margin:0;">No comments to moderate</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

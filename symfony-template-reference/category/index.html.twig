@@ -1,0 +1,45 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<div class="categories-container">
+    <div class="categories-header">
+        <h1 class="page-title" style="margin:0;">Categories</h1>
+        <a href="{{ path('app_category_new') }}" class="btn btn-primary" style="gap:0.4rem;">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+        </a>
+    </div>
+
+    <div class="categories-grid">
+        {% for category in categories %}
+            <div class="category-card glassmorphism">
+                <h3>
+                    <i data-lucide="tag"></i>
+                    {{ category.name }}
+                </h3>
+                <div class="category-actions">
+                    <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="btn btn-icon btn-action" data-tooltip="Edit">
+                        <i data-lucide="pencil" style="width:16px;height:16px;"></i>
+                    </a>
+                    <form method="post" action="{{ path('app_category_delete', {'id': category.id}) }}" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                        <button type="submit" class="btn btn-icon btn-danger" data-tooltip="Delete">
+                            <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-state glassmorphism" style="grid-column:1/-1;">
+                <i data-lucide="folder-open" style="width:48px;height:48px;color:var(--text-subtle);margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                <p style="color:var(--text-muted);margin-bottom:1rem;">No categories found</p>
+                <a href="{{ path('app_category_new') }}" class="btn btn-primary" style="gap:0.4rem;">
+                    <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                    Create First Category
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

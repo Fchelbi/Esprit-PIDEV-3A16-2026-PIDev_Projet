@@ -1,0 +1,185 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Ajouter Utilisateur · EchoCare{% endblock %}
+
+{% block content %}
+<style>
+    .new-card {
+        background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.8rem;
+        max-width: 580px; width: 100%;
+        border: 1px solid var(--border-color); backdrop-filter: blur(8px);
+    }
+    .new-card-header { margin-bottom: 1.4rem; }
+    .new-card-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem; }
+    .new-card-header p { font-size: 0.8rem; color: var(--text-subtle); margin: 0; }
+    .new-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: rgba(232, 137, 90,0.12); color: var(--primary-color);
+        border: 1px solid rgba(232, 137, 90,0.25);
+        padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .new-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .new-field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+    .new-label {
+        font-size: 0.72rem; font-weight: 700; color: var(--text-subtle);
+        letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    .new-input {
+        padding: 0.6rem 0.85rem; border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
+        font-size: 0.875rem; color: var(--text-main); outline: none;
+        transition: border-color 0.2s; width: 100%; font-family: inherit;
+    }
+    .new-input::placeholder { color: var(--text-subtle); }
+    .new-input:focus { border-color: var(--primary-color); background: rgba(232, 137, 90,0.05); }
+    .new-input.error { border-color: var(--danger); }
+    .new-input option { background: #162232; color: white; }
+    .new-error { font-size: 0.72rem; color: var(--danger-text); margin-top: 0.25rem; display: none; }
+    .new-pw-wrap { position: relative; }
+    .new-pw-wrap .new-input { padding-right: 2.5rem; }
+    .new-toggle-pw {
+        position: absolute; right: 0.75rem; top: 50%;
+        transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: var(--text-subtle);
+    }
+    .strength-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.06); margin-top: 0.4rem; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+    .strength-text { font-size: 0.72rem; color: var(--text-subtle); margin-top: 0.2rem; }
+    .new-btn-submit {
+        width: 100%; padding: 0.7rem; background: var(--primary-color); color: white;
+        border: none; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+        cursor: pointer; margin-top: 0.5rem; font-family: inherit; transition: all 0.2s;
+    }
+    .new-btn-submit:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .new-btn-cancel {
+        width: 100%; padding: 0.65rem; background: rgba(255,255,255,0.04); color: var(--text-muted);
+        border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+        font-size: 0.875rem; font-weight: 600; text-decoration: none;
+        display: block; text-align: center; margin-top: 0.5rem; transition: all 0.2s;
+    }
+    .new-btn-cancel:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+    .new-divider { border: none; border-top: 1px solid var(--border-color); margin: 0.25rem 0 1rem; }
+</style>
+
+<div style="display: flex; justify-content: center; width: 100%;">
+<div class="new-card">
+    <div class="new-card-header">
+        <span class="new-badge">➕ Nouveau</span>
+        <h2>Ajouter un utilisateur</h2>
+        <p>Remplissez les informations ci-dessous</p>
+    </div>
+
+    <form method="post" id="newForm" novalidate>
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Nom</label>
+                <input class="new-input" type="text" name="nom" id="nom" placeholder="Nom" required>
+                <span class="new-error" id="nom-error">Min 2 caractères</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Prénom</label>
+                <input class="new-input" type="text" name="prenom" id="prenom" placeholder="Prénom" required>
+                <span class="new-error" id="prenom-error">Min 2 caractères</span>
+            </div>
+        </div>
+
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Email</label>
+                <input class="new-input" type="email" name="email" id="email" placeholder="vous@exemple.com" required>
+                <span class="new-error" id="email-error">Email invalide</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Téléphone</label>
+                <input class="new-input" type="text" name="num_tel" id="num_tel" placeholder="Ex: 22000000">
+                <span class="new-error" id="tel-error">8 chiffres requis</span>
+            </div>
+        </div>
+
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Mot de passe</label>
+                <div class="new-pw-wrap">
+                    <input class="new-input" type="password" name="password" id="password" placeholder="••••••••" required>
+                    <span class="new-toggle-pw" onclick="togglePw('password', this)">👁️</span>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                <span class="strength-text" id="strength-text"></span>
+                <span class="new-error" id="pw-error">Min 8 car. majuscule + chiffre + symbole</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Confirmer mot de passe</label>
+                <div class="new-pw-wrap">
+                    <input class="new-input" type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required>
+                    <span class="new-toggle-pw" onclick="togglePw('confirm_password', this)">👁️</span>
+                </div>
+                <span class="new-error" id="confirm-error">Mots de passe différents</span>
+            </div>
+        </div>
+
+        <div class="new-field">
+            <label class="new-label">Rôle</label>
+            <select class="new-input" name="role" id="role" required>
+                <option value="">-- Choisir un rôle --</option>
+                <option value="Patient">🌿 Patient</option>
+                <option value="Coach">🏋️ Coach</option>
+                <option value="Admin">👑 Admin</option>
+            </select>
+            <span class="new-error" id="role-error">Veuillez choisir un rôle</span>
+        </div>
+
+        <hr class="new-divider">
+        <button type="submit" class="new-btn-submit">✅ Ajouter l'utilisateur</button>
+    </form>
+    <a href="{{ path('admin_dashboard') }}" class="new-btn-cancel">← Annuler</a>
+</div>
+</div>
+
+<script>
+    function togglePw(id, el) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        el.textContent = input.type === 'password' ? '👁️' : '🙈';
+    }
+    document.getElementById('password').addEventListener('input', function () {
+        const val = this.value;
+        const fill = document.getElementById('strength-fill');
+        const text = document.getElementById('strength-text');
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        const levels = [
+            { w: '0%', c: 'transparent', t: '' },
+            { w: '25%', c: '#e74c3c', t: '🔴 Très faible' },
+            { w: '50%', c: '#E8895A', t: '🟠 Faible' },
+            { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
+            { w: '100%', c: '#27ae60', t: '🟢 Fort' },
+        ];
+        fill.style.width = levels[score].w;
+        fill.style.background = levels[score].c;
+        text.textContent = levels[score].t;
+    });
+    document.getElementById('newForm').addEventListener('submit', function (e) {
+        let valid = true;
+        const show = (id) => { document.getElementById(id).style.display = 'block'; };
+        const hide = (id) => { document.getElementById(id).style.display = 'none'; };
+        const nom = document.getElementById('nom');
+        const prenom = document.getElementById('prenom');
+        const email = document.getElementById('email');
+        const tel = document.getElementById('num_tel');
+        const pw = document.getElementById('password');
+        const cpw = document.getElementById('confirm_password');
+        const role = document.getElementById('role');
+        if (nom.value.trim().length < 2) { nom.classList.add('error'); show('nom-error'); valid = false; } else { nom.classList.remove('error'); hide('nom-error'); }
+        if (prenom.value.trim().length < 2) { prenom.classList.add('error'); show('prenom-error'); valid = false; } else { prenom.classList.remove('error'); hide('prenom-error'); }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.classList.add('error'); show('email-error'); valid = false; } else { email.classList.remove('error'); hide('email-error'); }
+        if (tel.value && !/^\d{8}$/.test(tel.value.replace(/\s/g, ''))) { tel.classList.add('error'); show('tel-error'); valid = false; } else { tel.classList.remove('error'); hide('tel-error'); }
+        if (!/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(pw.value)) { pw.classList.add('error'); show('pw-error'); valid = false; } else { pw.classList.remove('error'); hide('pw-error'); }
+        if (pw.value !== cpw.value) { cpw.classList.add('error'); show('confirm-error'); valid = false; } else { cpw.classList.remove('error'); hide('confirm-error'); }
+        if (!role.value) { role.classList.add('error'); show('role-error'); valid = false; } else { role.classList.remove('error'); hide('role-error'); }
+        if (!valid) e.preventDefault();
+    });
+</script>
+{% endblock %}

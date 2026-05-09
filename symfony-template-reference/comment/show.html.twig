@@ -1,0 +1,30 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}View Comment{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;margin:0 auto;">
+    <div class="post-card glassmorphism" style="animation:scaleIn 0.5s ease forwards;">
+        <h1 class="page-title" style="font-size:1.6rem;">Comment Details</h1>
+
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:block;color:var(--text-subtle);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem;font-weight:600;">Content</label>
+            <p style="color:var(--text-main);line-height:1.7;margin:0;">{{ comment.content }}</p>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:block;color:var(--text-subtle);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem;font-weight:600;">Created</label>
+            <p style="color:var(--text-muted);margin:0;">{{ comment.createdAt ? comment.createdAt|date('M j, Y \\a\\t g:i A') : '—' }}</p>
+        </div>
+
+        <div style="display:flex;gap:0.6rem;padding-top:1.5rem;border-top:1px solid var(--border-color);">
+            <a href="{{ path('app_comment_index') }}" class="btn btn-icon btn-secondary" data-tooltip="Back">
+                <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+            </a>
+            <a href="{{ path('app_comment_edit', {'id': comment.id}) }}" class="btn btn-icon btn-action" data-tooltip="Edit">
+                <i data-lucide="pencil" style="width:16px;height:16px;"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

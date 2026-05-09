@@ -1,0 +1,50 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Comment index{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:0 auto;">
+    <div class="categories-header">
+        <h1 class="page-title" style="margin:0;">Comments</h1>
+        <a href="{{ path('app_comment_new') }}" class="btn btn-primary" style="gap:0.4rem;">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+        </a>
+    </div>
+
+    <div class="users-table-wrapper glassmorphism" style="padding:1.5rem;">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Content</th>
+                    <th>Created</th>
+                    <th style="text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for comment in comments %}
+                <tr>
+                    <td style="color:var(--text-subtle);">{{ comment.id }}</td>
+                    <td style="color:var(--text-main);">{{ comment.content|length > 80 ? comment.content|slice(0,80) ~ '...' : comment.content }}</td>
+                    <td>{{ comment.createdAt ? comment.createdAt|date('M j, Y') : '—' }}</td>
+                    <td style="text-align:center;">
+                        <div style="display:flex;gap:0.4rem;justify-content:center;">
+                            <a href="{{ path('app_comment_show', {'id': comment.id}) }}" class="btn btn-icon btn-icon-sm btn-action" data-tooltip="View">
+                                <i data-lucide="eye" style="width:14px;height:14px;"></i>
+                            </a>
+                            <a href="{{ path('app_comment_edit', {'id': comment.id}) }}" class="btn btn-icon btn-icon-sm btn-action" data-tooltip="Edit">
+                                <i data-lucide="pencil" style="width:14px;height:14px;"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:2rem;color:var(--text-subtle);">No comments found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

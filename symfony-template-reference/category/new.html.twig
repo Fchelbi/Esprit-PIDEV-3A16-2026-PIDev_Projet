@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}New Category{% endblock %}
+
+{% block content %}
+<div class="form-container glassmorphism">
+    <h1 class="page-title">Create new Category</h1>
+
+    {{ include('category/_form.html.twig') }}
+
+    <div style="margin-top:1.2rem;">
+        <a href="{{ path('app_category_index') }}" class="btn btn-icon btn-secondary" data-tooltip="Back">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

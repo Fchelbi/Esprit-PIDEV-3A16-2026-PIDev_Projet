@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.CommentController"
+            styleClass="root-pane">
+
+    <top>
+        <VBox styleClass="top-bar">
+            <HBox styleClass="title-bar" alignment="CENTER_LEFT" spacing="12">
+                <padding>
+                    <Insets top="16" right="16" bottom="16" left="16"/>
+                </padding>
+                <Button text="← Back" styleClass="btn-secondary" onAction="#onBack"/>
+                <Label fx:id="postTitleLabel" text="Comments" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Refresh" styleClass="btn-secondary" onAction="#onRefresh"/>
+            </HBox>
+            <Separator/>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="commentsTable" styleClass="data-table">
+            <columns>
+                <TableColumn fx:id="colId"        text="ID"        prefWidth="55"/>
+                <TableColumn fx:id="colContent"   text="CONTENT"   prefWidth="380"/>
+                <TableColumn fx:id="colUserId"    text="USER ID"   prefWidth="80"/>
+                <TableColumn fx:id="colCreatedAt" text="CREATED AT" prefWidth="160"/>
+                <TableColumn fx:id="colParentId"  text="PARENT ID" prefWidth="90"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <VBox styleClass="form-area" spacing="10">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16"/>
+            </padding>
+
+            <Label text="ADD / EDIT COMMENT" styleClass="form-title"/>
+
+            <HBox spacing="10">
+                <TextArea fx:id="contentField" promptText="Comment content..."
+                          prefHeight="80" wrapText="true" HBox.hgrow="ALWAYS"/>
+                <VBox spacing="8" prefWidth="240">
+                    <TextField fx:id="parentIdField" promptText="Parent ID (optional — for replies)"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="Save"             styleClass="btn-primary"   onAction="#onSave"/>
+                <Button text="Update Selected"  styleClass="btn-secondary" onAction="#onUpdate"/>
+                <Button text="Delete Selected"  styleClass="btn-danger"    onAction="#onDelete"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Clear"            styleClass="btn-secondary" onAction="#onClear"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Export Utilisateurs</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: white; padding: 30px; }
+    h1 { color: #4A6FA5; font-size: 22px; margin-bottom: 4px; }
+    .subtitle { color: #999; font-size: 13px; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #4A6FA5; color: white; }
+    th { padding: 12px 14px; text-align: left; font-size: 13px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .badge { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+    .admin   { background: #fde8d8; color: #E8895A; }
+    .coach   { background: #d8eafd; color: #4A6FA5; }
+    .patient { background: #d8fde8; color: #27ae60; }
+    .footer { margin-top: 20px; font-size: 11px; color: #aaa; text-align: center; }
+    .btn-print {
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 10px 24px;
+        background: #4A6FA5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    @media print {
+        .btn-print { display: none; }
+        body { padding: 10px; }
+    }
+</style>
+</head>
+<body>
+
+<button class="btn-print" onclick="window.print()">🖨️ Imprimer / Sauvegarder PDF</button>
+
+<h1>🩺 EchoCare — Liste des Utilisateurs</h1>
+<div class="subtitle">
+    Exporté le {{ date|date('d/m/Y à H:i') }} — {{ users|length }} utilisateur(s)
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Rôle</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.nom }}</td>
+            <td>{{ user.prenom }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.numTel ?? '—' }}</td>
+            <td>
+                <span class="badge {{ user.role|lower }}">{{ user.role }}</span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="footer">EchoCare Admin — Document généré automatiquement</div>
+
+</body>
+</html>

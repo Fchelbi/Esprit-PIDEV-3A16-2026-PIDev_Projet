@@ -1,0 +1,74 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1 class="page-title">Admin Dashboard</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card glassmorphism">
+            <div class="stat-icon">
+                <i data-lucide="file-text"></i>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Total Posts</p>
+                <p class="stat-value">{{ stats.total_posts }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card glassmorphism">
+            <div class="stat-icon">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Total Users</p>
+                <p class="stat-value">{{ stats.total_users }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card glassmorphism">
+            <div class="stat-icon">
+                <i data-lucide="message-circle"></i>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Total Comments</p>
+                <p class="stat-value">{{ stats.total_comments }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="glassmorphism" style="padding:2rem;margin-top:2rem;animation:slideUp 0.5s ease forwards;animation-delay:0.35s;opacity:0;">
+        <h2 style="margin:0 0 1.5rem 0;color:var(--text-main);font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:0.6rem;">
+            <i data-lucide="zap" style="width:20px;height:20px;color:var(--primary-color);"></i>
+            Quick Actions
+        </h2>
+        <div class="quick-actions">
+            <a href="{{ path('app_category_new') }}" class="quick-action-card">
+                <i data-lucide="tag"></i>
+                Create Category
+            </a>
+            <a href="{{ path('app_admin_users') }}" class="quick-action-card">
+                <i data-lucide="users"></i>
+                Manage Users
+            </a>
+            <a href="{{ path('app_admin_moderation') }}" class="quick-action-card">
+                <i data-lucide="shield-check"></i>
+                Review Content
+            </a>
+            <a href="{{ path('app_admin_forum') }}" class="quick-action-card">
+                <i data-lucide="message-square-warning"></i>
+                Forum Admin
+            </a>
+            <a href="{{ path('app_formation_index') }}" class="quick-action-card">
+    <i data-lucide="book-open"></i>
+    Formations
+</a>
+<a href="{{ path('app_statistics') }}" class="quick-action-card">
+    <i data-lucide="bar-chart-2"></i>
+    Statistiques
+</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

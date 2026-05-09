@@ -1,0 +1,1198 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="show-container">
+
+    {# ── POST CARD ── #}
+    <article class="show-post-card glassmorphism">
+
+        {# Top accent bar #}
+        <div class="show-post-accent"></div>
+
+        <div class="show-post-inner">
+
+            {# Header row #}
+            <div class="show-post-header">
+                <div class="show-author">
+                    {% if post.user.photo %}
+                        <img src="{{ post.user.photo }}" alt="" class="show-avatar">
+                    {% else %}
+                        <div class="show-avatar show-avatar-placeholder">{{ post.user.prenom|slice(0,1) }}{{ post.user.nom|slice(0,1) }}</div>
+                    {% endif %}
+                    <div class="show-author-info">
+                        <span class="show-author-name">{{ post.user.prenom }} {{ post.user.nom }}</span>
+                        <span class="show-author-meta">
+                            {{ post.createdAt ? post.createdAt|date('M j, Y · g:i A') : '' }}
+                            {% if post.category %}
+                                <span class="show-dot">·</span>
+                                <span class="show-category-pill">{{ post.category.name }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <a href="{{ path('app_post_index') }}" class="show-back-btn" title="Back to Feed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back
+                </a>
+            </div>
+
+            {# Title #}
+            <h1 class="show-post-title" id="show-post-title">{{ post.title }}</h1>
+
+            {# Photo #}
+            {% if post.photo %}
+                <div class="show-photo-wrap">
+                    <img src="{{ post.photo }}" alt="{{ post.title }}" class="show-photo" loading="lazy">
+                </div>
+            {% endif %}
+
+            {# Content #}
+            <p class="show-post-body" id="show-post-content">{{ post.content }}</p>
+
+            {# Translate + Voice bar #}
+            <div class="tx-bar">
+                <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('show-post-title').innerText + '. ' + document.getElementById('show-post-content').innerText, this)" title="Listen to this post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                    Listen
+                </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <div class="tx-pills" id="tx-pills-post">
+                    <button class="tx-pill" onclick="txPost('en',this)" type="button">EN</button>
+                    <button class="tx-pill" onclick="txPost('fr',this)" type="button">FR</button>
+                    <button class="tx-pill" onclick="txPost('ar',this)" type="button">AR</button>
+                    <button class="tx-pill" onclick="txPost('es',this)" type="button">ES</button>
+                    <button class="tx-pill" onclick="txPost('de',this)" type="button">DE</button>
+                    <button class="tx-pill" onclick="txPost('it',this)" type="button">IT</button>
+                    <button class="tx-pill" onclick="txPost('pt',this)" type="button">PT</button>
+                    <button class="tx-pill" onclick="txPost('zh-CN',this)" type="button">ZH</button>
+                </div>
+                <span class="tx-badge" id="txb-post"></span>
+            </div>
+
+            {# Footer: reactions + edit/delete #}
+            <div class="show-post-footer">
+                <div class="show-reactions">
+                    <button class="show-react-btn like-btn {{ app.user and app.user in post.likedByUsers ? 'active' : '' }}" onclick="likePost({{ post.id }})" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        <span id="likes-{{ post.id }}">{{ post.likedByUsers|length }}</span>
+                    </button>
+                    <button class="show-react-btn dislike-btn {{ app.user and app.user in post.dislikedByUsers ? 'active' : '' }}" onclick="dislikePost({{ post.id }})" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                        <span id="dislikes-{{ post.id }}">{{ post.dislikedByUsers|length }}</span>
+                    </button>
+                    <span class="show-comment-stat">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        {{ post.comments|length }}
+                    </span>
+                </div>
+                {% if app.user and (app.user == post.user or is_granted('ROLE_ADMIN')) %}
+                <div class="show-post-actions">
+                    <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="show-action-btn" title="Edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit
+                    </a>
+                    <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" style="display:inline;margin:0;" onsubmit="return confirm('Delete this post?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                        <button type="submit" class="show-action-btn show-action-danger" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                            Delete
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </article>
+
+    {# ── COMMENTS SECTION ── #}
+    <section class="show-comments glassmorphism">
+
+        {# Header #}
+        <div class="show-comments-hd">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+                <div class="show-comments-hd-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="show-comments-hd-title">Community Discussion</span>
+            </div>
+            <span class="show-comment-count">{{ post.comments|length }} comment{{ post.comments|length != 1 ? 's' : '' }}</span>
+        </div>
+
+        {# Comment list #}
+        {% if topLevelComments|length > 0 %}
+        <div class="show-comments-list">
+            {% for comment in topLevelComments %}
+
+            <div class="show-comment" id="comment-{{ comment.id }}">
+                <div class="show-comment-inner">
+
+                    {# Avatar column #}
+                    <div class="show-comment-avatar-col">
+                        {% if comment.user.photo %}
+                            <img src="{{ comment.user.photo }}" alt="" class="show-comment-avatar">
+                        {% else %}
+                            <div class="show-comment-avatar show-comment-avatar-ph">{{ comment.user.prenom|slice(0,1) }}{{ comment.user.nom|slice(0,1) }}</div>
+                        {% endif %}
+                        {% if comment.replies|length > 0 %}
+                            <div class="show-thread-line"></div>
+                        {% endif %}
+                    </div>
+
+                    {# Body column #}
+                    <div class="show-comment-body-col">
+                        {# Name + date + actions #}
+                        <div class="show-comment-top">
+                            <div class="show-comment-meta">
+                                <span class="show-comment-name">{{ comment.user.prenom }} {{ comment.user.nom }}</span>
+                                <span class="show-comment-date">{{ comment.createdAt ? comment.createdAt|date('M j, Y') : '' }}</span>
+                            </div>
+                            <div class="show-comment-acts">
+                                <button class="show-cact-btn" onclick="toggleReplyForm({{ comment.id }})" type="button" title="Reply">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                                    Reply
+                                </button>
+                                {% if app.user and (app.user == comment.user or is_granted('ROLE_ADMIN')) %}
+                                <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" style="display:inline;margin:0;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                    <button type="submit" class="show-cact-btn show-cact-danger" title="Delete" onclick="return confirm('Delete this comment?')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {# Text #}
+                        <p class="show-comment-text" id="cc-{{ comment.id }}">{{ comment.content }}</p>
+
+                        {# Reactions + voice + translate #}
+                        <div class="show-comment-bar">
+                            <div class="show-comment-reacts">
+                                <button class="show-react-sm like-btn {{ app.user and comment.likedByUsers.contains(app.user) ? 'active' : '' }}"
+                                        onclick="likeComment({{ comment.id }})" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                                    <span id="comment-likes-{{ comment.id }}">{{ comment.likedByUsers.count }}</span>
+                                </button>
+                                <button class="show-react-sm dislike-btn {{ app.user and comment.dislikedByUsers.contains(app.user) ? 'active' : '' }}"
+                                        onclick="dislikeComment({{ comment.id }})" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                                    <span id="comment-dislikes-{{ comment.id }}">{{ comment.dislikedByUsers.count }}</span>
+                                </button>
+                                <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('cc-{{ comment.id }}').innerText, this)" title="Listen">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                </button>
+                            </div>
+                            <div class="tx-pills-sm" id="tx-pills-c{{ comment.id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'en',this)" type="button">EN</button>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'fr',this)" type="button">FR</button>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'ar',this)" type="button">AR</button>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'es',this)" type="button">ES</button>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'de',this)" type="button">DE</button>
+                                <button class="tx-pill-xs" onclick="txComment({{ comment.id }},'zh-CN',this)" type="button">ZH</button>
+                                <span class="tx-badge" id="txcb-{{ comment.id }}"></span>
+                            </div>
+                        </div>
+
+                        {# Reply form #}
+                        <div id="reply-form-{{ comment.id }}" class="show-reply-form" style="display:none;">
+                            <form method="post" action="{{ path('app_post_comment', {'id': post.id}) }}" style="margin:0;">
+                                <input type="hidden" name="parentId" value="{{ comment.id }}">
+                                <input type="hidden" name="comment[_token]" value="{{ csrf_token('comment') }}">
+                                <textarea name="comment[content]" required placeholder="Reply to {{ comment.user.prenom }}…" class="show-reply-textarea"></textarea>
+                                <div class="show-reply-actions">
+                                    <button type="button" class="show-reply-cancel" onclick="toggleReplyForm({{ comment.id }})">Cancel</button>
+                                    <button type="submit" class="show-reply-submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                        Reply
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {# Replies #}
+                        {% if comment.replies|length > 0 %}
+                        <div class="show-replies">
+                            {% for reply in comment.replies %}
+                            <div class="show-reply" id="comment-{{ reply.id }}">
+                                <div class="show-reply-header">
+                                    {% if reply.user.photo %}
+                                        <img src="{{ reply.user.photo }}" alt="" class="show-reply-avatar">
+                                    {% else %}
+                                        <div class="show-reply-avatar show-reply-avatar-ph">{{ reply.user.prenom|slice(0,1) }}{{ reply.user.nom|slice(0,1) }}</div>
+                                    {% endif %}
+                                    <span class="show-comment-name" style="font-size:0.82rem;">{{ reply.user.prenom }} {{ reply.user.nom }}</span>
+                                    <span class="show-comment-date">{{ reply.createdAt ? reply.createdAt|date('M j, Y') : '' }}</span>
+                                    {% if app.user and (app.user == reply.user or is_granted('ROLE_ADMIN')) %}
+                                    <form method="post" action="{{ path('app_comment_delete', {'id': reply.id}) }}" style="display:inline;margin:0 0 0 auto;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reply.id) }}">
+                                        <button type="submit" class="show-cact-btn show-cact-danger" onclick="return confirm('Delete?')" title="Delete">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                                <p class="show-reply-text" id="cc-{{ reply.id }}">{{ reply.content }}</p>
+                                <div class="show-comment-bar" style="margin-top: 0.5rem;">
+                                    <div class="show-comment-reacts">
+                                        <button class="show-react-sm like-btn {{ app.user and reply.likedByUsers.contains(app.user) ? 'active' : '' }}"
+                                                onclick="likeComment({{ reply.id }})" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                                            <span id="comment-likes-{{ reply.id }}">{{ reply.likedByUsers.count }}</span>
+                                        </button>
+                                        <button class="show-react-sm dislike-btn {{ app.user and reply.dislikedByUsers.contains(app.user) ? 'active' : '' }}"
+                                                onclick="dislikeComment({{ reply.id }})" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                                            <span id="comment-dislikes-{{ reply.id }}">{{ reply.dislikedByUsers.count }}</span>
+                                        </button>
+                                        <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('cc-{{ reply.id }}').innerText, this)" title="Listen">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                        </button>
+                                    </div>
+                                    <div class="tx-pills-sm" id="tx-pills-c{{ reply.id }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'en',this)" type="button">EN</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'fr',this)" type="button">FR</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'ar',this)" type="button">AR</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'es',this)" type="button">ES</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'de',this)" type="button">DE</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'zh-CN',this)" type="button">ZH</button>
+                                        <span class="tx-badge" id="txcb-{{ reply.id }}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="show-no-comments">
+            <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.2;display:block;margin:0 auto 1rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <p>No comments yet — be the first to start the conversation!</p>
+        </div>
+        {% endif %}
+
+        {# ── Add Comment ── #}
+        <div class="show-add-comment">
+            <div class="show-add-comment-header">
+                {% if app.user and app.user.photo %}
+                    <img src="{{ app.user.photo }}" alt="" class="show-comment-avatar">
+                {% elseif app.user %}
+                    <div class="show-comment-avatar show-comment-avatar-ph">{{ app.user.prenom|slice(0,1) }}{{ app.user.nom|slice(0,1) }}</div>
+                {% endif %}
+                <span class="show-add-comment-who">
+                    {% if app.user %}{{ app.user.prenom }} {{ app.user.nom }}{% else %}Guest{% endif %}
+                </span>
+            </div>
+            {{ form_start(comment_form, {
+                'action': path('app_post_comment', {'id': post.id}),
+                'attr': {'style': 'margin:0;', 'class': 'show-comment-form'}
+            }) }}
+                {{ form_widget(comment_form.content, {
+                    'attr': {
+                        'placeholder': 'Share your thoughts…',
+                        'rows': 3,
+                        'class': 'show-comment-textarea',
+                        'style': 'width:100%;resize:vertical;'
+                    }
+                }) }}
+                <div class="show-comment-form-footer">
+                    <span class="show-comment-hint">Be respectful and constructive</span>
+                    <button type="submit" class="show-submit-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Post Comment
+                    </button>
+                </div>
+            {{ form_end(comment_form) }}
+        </div>
+
+    </section>
+</div>
+
+<style>
+/* ─────────────────────────────────────────
+   SHOW PAGE LAYOUT
+───────────────────────────────────────── */
+.show-container {
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ─────────────────────────────────────────
+   POST CARD
+───────────────────────────────────────── */
+.show-post-card {
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.2s;
+}
+
+.show-post-accent {
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), #FFD6A5, var(--accent));
+}
+
+.show-post-inner {
+    padding: 1.75rem;
+}
+
+.show-post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.3rem;
+    gap: 0.75rem;
+}
+
+.show-author {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.show-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.show-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), #E8895A);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.show-author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.show-author-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text-main);
+}
+
+.show-author-meta {
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+.show-dot { opacity: 0.4; }
+
+.show-category-pill {
+    background: var(--primary-glow);
+    color: var(--primary-color);
+    border: 1px solid rgba(232, 137, 90,0.2);
+    border-radius: 4px;
+    padding: 0.05rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.show-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-subtle);
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: rgba(255,255,255,0.02);
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+
+.show-back-btn:hover {
+    color: var(--text-main);
+    border-color: var(--border-hover);
+    background: rgba(255,255,255,0.05);
+}
+
+.show-post-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 1rem;
+    letter-spacing: -0.4px;
+    line-height: 1.3;
+}
+
+.show-photo-wrap {
+    margin: 0 -1.75rem 1.25rem;
+}
+
+.show-photo {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+}
+
+.show-post-body {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+    white-space: pre-wrap;
+}
+
+/* ─── Translate bar (post) ─── */
+.tx-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 0.9rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.tx-bar-label {
+    font-size: 0.72rem;
+    color: var(--text-subtle);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.tx-pills {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tx-pill {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-subtle);
+    border-radius: 5px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+}
+
+.tx-pill:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--primary-glow);
+}
+
+.tx-pill.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* ─── Translate pills (comments, tiny) ─── */
+.tx-pills-sm {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.tx-pill-xs {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--text-subtle);
+    border-radius: 4px;
+    padding: 0.12rem 0.38rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.4px;
+    transition: all 0.15s;
+}
+
+.tx-pill-xs:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.tx-pill-xs.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.tx-badge {
+    font-size: 0.7rem;
+    color: var(--text-subtle);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    margin-left: 0.1rem;
+}
+
+.tx-badge a { color: var(--primary-color); }
+
+.tx-spinner {
+    width: 10px; height: 10px;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.55s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Post footer ─── */
+.show-post-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    gap: 0.75rem;
+}
+
+.show-reactions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.show-react-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s;
+}
+
+.show-react-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-main); }
+
+.show-react-btn.like-btn.active    { background: rgba(94,179,131,0.15); border-color: rgba(94,179,131,0.35); color: #5eb383; }
+.show-react-btn.dislike-btn.active { background: rgba(226,125,96,0.12); border-color: rgba(226,125,96,0.3);  color: var(--danger); }
+
+.show-comment-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-subtle);
+    padding: 0.45rem 0.75rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+.show-post-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.show-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-muted);
+}
+
+.show-action-btn:hover { background: rgba(255,255,255,0.07); color: var(--text-main); }
+
+.show-action-danger { border-color: var(--danger-border); color: var(--danger-text); background: var(--danger-bg); }
+.show-action-danger:hover { background: rgba(226,125,96,0.2); color: #f0a38b; }
+
+/* ─────────────────────────────────────────
+   COMMENTS SECTION
+───────────────────────────────────────── */
+.show-comments {
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.show-comments-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.01);
+}
+
+.show-comments-hd-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--primary-glow);
+    border: 1px solid rgba(232, 137, 90,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.show-comments-hd-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.show-comment-count {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-subtle);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+}
+
+/* ─── Comment list ─── */
+.show-comments-list {
+    padding: 0.5rem 1.5rem 0;
+}
+
+.show-comment {
+    padding: 1.1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.show-comment:last-child { border-bottom: none; }
+
+.show-comment-inner {
+    display: flex;
+    gap: 0.85rem;
+}
+
+.show-comment-avatar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.show-comment-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.show-comment-avatar-ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-color), #E8895A);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.68rem;
+}
+
+.show-thread-line {
+    width: 2px;
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    margin-top: 6px;
+    border-radius: 1px;
+    min-height: 24px;
+}
+
+.show-comment-body-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.show-comment-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.45rem;
+    gap: 0.5rem;
+}
+
+.show-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.show-comment-name {
+    font-weight: 700;
+    font-size: 0.86rem;
+    color: var(--text-main);
+}
+
+.show-comment-date {
+    font-size: 0.72rem;
+    color: var(--text-subtle);
+}
+
+.show-comment-acts {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+
+.show-cact-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-subtle);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 0.22rem 0.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.show-cact-btn:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+    color: var(--text-main);
+}
+
+.show-cact-danger:hover { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-text); }
+
+.show-comment-text {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-main);
+    margin: 0 0 0.6rem;
+}
+
+.show-comment-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+}
+
+.show-comment-reacts {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.show-react-sm {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.22rem 0.55rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 5px;
+    color: var(--text-subtle);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.show-react-sm:hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+.show-react-sm.like-btn.active    { background: rgba(94,179,131,0.12); border-color: rgba(94,179,131,0.3);  color: #5eb383; }
+.show-react-sm.dislike-btn.active { background: rgba(226,125,96,0.1);  border-color: rgba(226,125,96,0.25); color: var(--danger); }
+
+/* ─── Reply form ─── */
+.show-reply-form {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    background: rgba(0,0,0,0.18);
+    border: 1px dashed rgba(255,255,255,0.08);
+    border-radius: 10px;
+}
+
+.show-reply-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.86rem;
+    resize: vertical;
+    min-height: 72px;
+    line-height: 1.55;
+    transition: border-color 0.18s, background 0.18s;
+}
+
+.show-reply-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(232, 137, 90,0.04);
+}
+
+.show-reply-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+}
+
+.show-reply-cancel {
+    padding: 0.38rem 0.85rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 7px;
+    color: var(--text-subtle);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+
+.show-reply-cancel:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+
+.show-reply-submit {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.38rem 0.95rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.show-reply-submit:hover { background: var(--primary-hover); }
+
+/* ─── Nested replies ─── */
+.show-replies {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.show-reply {
+    padding: 0.8rem 0.9rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: border-color 0.15s;
+}
+
+.show-reply:hover { border-color: rgba(255,255,255,0.07); }
+
+.show-reply-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.show-reply-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.show-reply-avatar-ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent), var(--primary-color));
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.58rem;
+}
+
+.show-reply-text {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ─── No comments ─── */
+.show-no-comments {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-subtle);
+    font-size: 0.9rem;
+}
+
+.show-no-comments p { margin: 0; }
+
+/* ─── Add comment ─── */
+.show-add-comment {
+    padding: 1.25rem 1.5rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.01);
+}
+
+.show-add-comment-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.9rem;
+}
+
+.show-add-comment-who {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.show-comment-form { margin: 0 !important; gap: 0 !important; }
+.show-comment-form label { display: none; }
+
+.show-comment-textarea {
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    padding: 0.85rem 1rem !important;
+    color: var(--text-main) !important;
+    font-size: 0.92rem !important;
+    line-height: 1.6 !important;
+    transition: border-color 0.18s, background 0.18s !important;
+}
+
+.show-comment-textarea:focus {
+    outline: none !important;
+    border-color: var(--primary-color) !important;
+    background: rgba(232, 137, 90,0.04) !important;
+    box-shadow: 0 0 0 3px rgba(232, 137, 90,0.08) !important;
+}
+
+.show-comment-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+}
+
+.show-comment-hint {
+    font-size: 0.75rem;
+    color: var(--text-subtle);
+}
+
+.show-submit-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.35rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 9px;
+    color: #fff;
+    font-size: 0.87rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.18s, transform 0.15s;
+}
+
+.show-submit-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.show-submit-btn:active { transform: translateY(0); }
+</style>
+
+<script>
+/* ── Google Translate (free endpoint — same as google-translator npm pkg) ── */
+async function gtranslate(text, lang) {
+    const res = await fetch(
+        'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' +
+        lang + '&dt=t&q=' + encodeURIComponent(text)
+    );
+    const data = await res.json();
+    return data[0].map(s => s[0]).join('');
+}
+
+async function txPost(lang, btn) {
+    const titleEl   = document.getElementById('show-post-title');
+    const contentEl = document.getElementById('show-post-content');
+    const badge     = document.getElementById('txb-post');
+    const pills     = document.querySelectorAll('#tx-pills-post .tx-pill');
+
+    if (btn.classList.contains('active')) {
+        txPostRestore(); return;
+    }
+
+    if (!titleEl.dataset.orig)   titleEl.dataset.orig   = titleEl.innerText;
+    if (!contentEl.dataset.orig) contentEl.dataset.orig = contentEl.innerText;
+
+    pills.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    badge.innerHTML = '<span class="tx-spinner"></span>';
+
+    try {
+        const [t, c] = await Promise.all([
+            gtranslate(titleEl.dataset.orig, lang),
+            gtranslate(contentEl.dataset.orig, lang)
+        ]);
+        titleEl.innerText   = t;
+        contentEl.innerText = c;
+        badge.innerHTML = 'Translated &middot; <a href="#" onclick="event.preventDefault();txPostRestore()">Original</a>';
+    } catch(e) {
+        pills.forEach(p => p.classList.remove('active'));
+        badge.innerHTML = '⚠ Failed';
+        setTimeout(() => { badge.innerHTML = ''; }, 3000);
+    }
+}
+
+function txPostRestore() {
+    const titleEl   = document.getElementById('show-post-title');
+    const contentEl = document.getElementById('show-post-content');
+    const badge     = document.getElementById('txb-post');
+    if (titleEl   && titleEl.dataset.orig)   titleEl.innerText   = titleEl.dataset.orig;
+    if (contentEl && contentEl.dataset.orig) contentEl.innerText = contentEl.dataset.orig;
+    document.querySelectorAll('#tx-pills-post .tx-pill').forEach(p => p.classList.remove('active'));
+    if (badge) badge.innerHTML = '';
+}
+
+async function txComment(id, lang, btn) {
+    const contentEl = document.getElementById('cc-' + id);
+    const badge     = document.getElementById('txcb-' + id);
+    const pills     = document.querySelectorAll('#tx-pills-c' + id + ' .tx-pill-xs');
+    if (!contentEl) return;
+
+    if (btn.classList.contains('active')) {
+        txCommentRestore(id); return;
+    }
+
+    if (!contentEl.dataset.orig) contentEl.dataset.orig = contentEl.innerText;
+    pills.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    badge.innerHTML = '<span class="tx-spinner"></span>';
+
+    try {
+        const translated = await gtranslate(contentEl.dataset.orig, lang);
+        contentEl.innerText = translated;
+        badge.innerHTML = 'Translated &middot; <a href="#" onclick="event.preventDefault();txCommentRestore(' + id + ')">Original</a>';
+    } catch(e) {
+        pills.forEach(p => p.classList.remove('active'));
+        badge.innerHTML = '⚠ Failed';
+        setTimeout(() => { badge.innerHTML = ''; }, 3000);
+    }
+}
+
+function txCommentRestore(id) {
+    const contentEl = document.getElementById('cc-' + id);
+    const badge     = document.getElementById('txcb-' + id);
+    if (contentEl && contentEl.dataset.orig) contentEl.innerText = contentEl.dataset.orig;
+    document.querySelectorAll('#tx-pills-c' + id + ' .tx-pill-xs').forEach(p => p.classList.remove('active'));
+    if (badge) badge.innerHTML = '';
+}
+
+function toggleReplyForm(id) {
+    const el = document.getElementById('reply-form-' + id);
+    if (!el) return;
+    const isHidden = el.style.display === 'none' || !el.style.display;
+    el.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) { const ta = el.querySelector('textarea'); if (ta) ta.focus(); }
+}
+
+function likePost(id) {
+    const btn = event.currentTarget;
+    fetch('/post/' + id + '/like', { method: 'POST' })
+        .then(r => r.json()).then(data => {
+            if (data.error) return alert(data.error);
+            document.getElementById('likes-' + id).innerText = data.likes;
+            document.getElementById('dislikes-' + id).innerText = data.dislikes;
+            btn.classList.toggle('active');
+            const other = btn.parentElement.querySelector('.dislike-btn');
+            if (other) other.classList.remove('active');
+        });
+}
+
+function dislikePost(id) {
+    const btn = event.currentTarget;
+    fetch('/post/' + id + '/dislike', { method: 'POST' })
+        .then(r => r.json()).then(data => {
+            if (data.error) return alert(data.error);
+            document.getElementById('likes-' + id).innerText = data.likes;
+            document.getElementById('dislikes-' + id).innerText = data.dislikes;
+            btn.classList.toggle('active');
+            const other = btn.parentElement.querySelector('.like-btn');
+            if (other) other.classList.remove('active');
+        });
+}
+
+function likeComment(id) {
+    const btn = event.currentTarget;
+    fetch('/post/comment/' + id + '/like', { method: 'POST' })
+        .then(r => r.json()).then(data => {
+            if (data.error) return alert(data.error);
+            document.getElementById('comment-likes-' + id).innerText = data.likes;
+            document.getElementById('comment-dislikes-' + id).innerText = data.dislikes;
+            btn.classList.toggle('active');
+            const reacts = btn.closest('.show-comment-reacts');
+            if (reacts) { const other = reacts.querySelector('.dislike-btn'); if (other) other.classList.remove('active'); }
+        });
+}
+
+function dislikeComment(id) {
+    const btn = event.currentTarget;
+    fetch('/post/comment/' + id + '/dislike', { method: 'POST' })
+        .then(r => r.json()).then(data => {
+            if (data.error) return alert(data.error);
+            document.getElementById('comment-likes-' + id).innerText = data.likes;
+            document.getElementById('comment-dislikes-' + id).innerText = data.dislikes;
+            btn.classList.toggle('active');
+            const reacts = btn.closest('.show-comment-reacts');
+            if (reacts) { const other = reacts.querySelector('.like-btn'); if (other) other.classList.remove('active'); }
+        });
+}
+</script>
+{% endblock %}

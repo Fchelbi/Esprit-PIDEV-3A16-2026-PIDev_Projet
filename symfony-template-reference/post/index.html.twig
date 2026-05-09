@@ -1,0 +1,348 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Community Feed{% endblock %}
+
+{% block content %}
+<div class="feed-layout">
+    <!-- ── MAIN FEED COLUMN ── -->
+    <div class="feed-main">
+        <div class="header-section">
+            <h1 class="page-title">Community Feed</h1>
+        </div>
+
+        {% if search_query %}
+            <div class="search-results-banner">
+                <span>Results for: <strong>{{ search_query }}</strong></span>
+                <a href="{{ path('app_post_index') }}">
+                    <i data-lucide="x" style="width:14px;height:14px;display:inline"></i> Clear
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Create Post Box -->
+        <div class="create-post-box glassmorphism">
+            <div class="user-info">
+                {% if app.user and app.user.photo %}
+                    <img src="{{ app.user.photo }}" alt="Avatar" class="avatar">
+                {% else %}
+                    <div class="avatar-placeholder" style="background:linear-gradient(135deg, var(--blue-claire), #E8895A);">{{ app.user ? app.user.prenom|slice(0,1)|upper : 'U' }}</div>
+                {% endif %}
+                <div class="user-details">
+                    <span class="user-name">{{ app.user ? app.user.prenom ~ ' ' ~ app.user.nom : 'Guest' }}</span>
+                </div>
+            </div>
+            <a href="{{ path('app_post_new') }}" class="create-post-btn">
+                What's on your mind?
+            </a>
+        </div>
+
+        <div class="posts-container" id="posts-container">
+            {% for post in posts %}
+                {{ include('post/_post_card.html.twig') }}
+            {% else %}
+                <div class="empty-state glassmorphism">
+                    <i data-lucide="message-circle" style="width:48px;height:48px;color:var(--text-subtle);margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                    <p style="font-size:1.1rem;">No posts yet. Start the conversation!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if posts|length == 5 %}
+            <div class="load-more-container">
+                <button id="load-more-btn" class="btn btn-primary btn-large" style="gap:0.6rem;">
+                    <i data-lucide="chevrons-down" style="width:18px;height:18px;"></i>
+                    Load More
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <aside class="feed-sidebar">
+        {% if app.user %}
+        <!-- Profile Card -->
+        <div class="panel-card glassmorphism">
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;">
+                {% if app.user.photo %}
+                    <img src="{{ app.user.photo }}" alt="Avatar" class="avatar" style="width:52px;height:52px;">
+                {% else %}
+                    <div class="avatar-placeholder" style="width:52px;height:52px;font-size:1.1rem;background:linear-gradient(135deg,var(--primary-color),#E8895A);">{{ app.user.prenom|slice(0,1)|upper }}</div>
+                {% endif %}
+                <div>
+                    <p style="margin:0;font-weight:700;color:var(--text-main);font-size:0.95rem;">{{ app.user.prenom }} {{ app.user.nom }}</p>
+                    <p style="margin:0.2rem 0 0;font-size:0.8rem;color:var(--text-subtle);">
+                        {% if is_granted('ROLE_ADMIN') %}Administrator{% elseif is_granted('ROLE_COACH') %}Coach{% else %}Member{% endif %}
+                    </p>
+                </div>
+            </div>
+            <a href="{{ path('app_post_new') }}" class="btn btn-primary" style="width:100%;justify-content:center;gap:0.5rem;">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Create Post
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Quick Links -->
+        <div class="panel-card glassmorphism">
+            <h3 class="panel-title">
+                <i data-lucide="compass" style="width:16px;height:16px;color:var(--primary-color);"></i>
+                Explore
+            </h3>
+            <div class="panel-links">
+                <a href="{{ path('app_post_index') }}" class="panel-link {{ app.request.attributes.get('_route') == 'app_post_index' ? 'active' : '' }}">
+                    <i data-lucide="newspaper" style="width:15px;height:15px;"></i>
+                    <span>Feed</span>
+                </a>
+                <a href="{{ path('app_post_new') }}" class="panel-link">
+                    <i data-lucide="edit-3" style="width:15px;height:15px;"></i>
+                    <span>Write a Post</span>
+                </a>
+                <a href="{{ path('app_category_index') }}" class="panel-link">
+                    <i data-lucide="tag" style="width:15px;height:15px;"></i>
+                    <span>Browse Categories</span>
+                </a>
+                <a href="#" class="panel-link" id="btn-random-advice">
+                    <i data-lucide="sparkles" style="width:15px;height:15px;color: #f59e0b;"></i>
+                    <span style="color: #f59e0b; font-weight: 500;">Random Advice</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Community Guidelines -->
+        <div class="panel-card glassmorphism">
+            <h3 class="panel-title">
+                <i data-lucide="shield-check" style="width:16px;height:16px;color:var(--primary-color);"></i>
+                Community Rules
+            </h3>
+            <ul class="panel-rules">
+                <li>Be respectful to all members</li>
+                <li>Share relevant wellness content</li>
+                <li>No spam or self-promotion</li>
+                <li>Protect personal information</li>
+                <li>Support one another</li>
+            </ul>
+        </div>
+    </aside>
+</div>
+
+<style>
+.feed-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.feed-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    position: sticky;
+    top: 5rem;
+}
+
+.panel-card {
+    padding: 1.4rem;
+    border-radius: var(--radius-lg);
+}
+
+.panel-title {
+    margin: 0 0 1rem 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.panel-link {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.panel-link:hover, .panel-link.active {
+    background: rgba(232, 137, 90, 0.08);
+    color: var(--text-main);
+}
+
+.panel-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.panel-rules {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.panel-rules li {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding-left: 1.2rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.panel-rules li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+    .feed-layout {
+        grid-template-columns: 1fr;
+    }
+    .feed-sidebar {
+        display: none;
+    }
+}
+</style>
+
+<script>
+    let offset = 5;
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if(loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            this.classList.add('btn-loading');
+            this.disabled = true;
+
+            fetch('/post/load-more/' + offset)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.count > 0) {
+                        document.getElementById('posts-container').insertAdjacentHTML('beforeend', data.html);
+                        offset += data.count;
+                        this.classList.remove('btn-loading');
+                        this.disabled = false;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                        if(data.count < 5) {
+                            this.parentElement.remove();
+                        }
+                    } else {
+                        this.parentElement.remove();
+                    }
+                });
+        });
+    }
+
+    function likePost(id) {
+        const btn = event.currentTarget;
+        const otherBtn = btn.parentElement.querySelector('.dislike-btn');
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = '', 200);
+        fetch('/post/' + id + '/like', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) return alert(data.error);
+                document.getElementById('likes-' + id).innerText = data.likes;
+                document.getElementById('dislikes-' + id).innerText = data.dislikes;
+                btn.classList.toggle('active');
+                otherBtn.classList.remove('active');
+            });
+    }
+
+    function dislikePost(id) {
+        const btn = event.currentTarget;
+        const otherBtn = btn.parentElement.querySelector('.like-btn');
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = '', 200);
+        fetch('/post/' + id + '/dislike', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) return alert(data.error);
+                document.getElementById('likes-' + id).innerText = data.likes;
+                document.getElementById('dislikes-' + id).innerText = data.dislikes;
+                btn.classList.toggle('active');
+                otherBtn.classList.remove('active');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.lazy-animate').forEach(el => observer.observe(el));
+    });
+
+    /* ── Google Translate (free endpoint — same as google-translator npm pkg) ── */
+    async function gtranslate(text, lang) {
+        const res = await fetch(
+            'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' +
+            lang + '&dt=t&q=' + encodeURIComponent(text)
+        );
+        const data = await res.json();
+        return data[0].map(s => s[0]).join('');
+    }
+
+    async function txCard(id, lang, btn) {
+        const titleEl   = document.getElementById('ptitle-' + id);
+        const contentEl = document.getElementById('pcontent-' + id);
+        const badge     = document.getElementById('txb-' + id);
+        const pills     = document.querySelectorAll('#tx-pills-' + id + ' .tx-pill');
+        if (!titleEl || !contentEl) return;
+
+        if (btn.classList.contains('active')) { txCardRestore(id); return; }
+
+        if (!titleEl.dataset.orig)   titleEl.dataset.orig   = titleEl.innerText;
+        if (!contentEl.dataset.orig) contentEl.dataset.orig = contentEl.innerText;
+
+        pills.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        badge.innerHTML = '<span class="tx-spinner"></span>';
+
+        try {
+            const [t, c] = await Promise.all([
+                gtranslate(titleEl.dataset.orig, lang),
+                gtranslate(contentEl.dataset.orig, lang)
+            ]);
+            titleEl.innerText   = t;
+            contentEl.innerText = c;
+            badge.innerHTML = 'Translated &middot; <a href="#" onclick="event.preventDefault();txCardRestore(' + id + ')">Original</a>';
+        } catch(e) {
+            pills.forEach(p => p.classList.remove('active'));
+            badge.innerHTML = '⚠ Failed';
+            setTimeout(() => { badge.innerHTML = ''; }, 3000);
+        }
+    }
+
+    function txCardRestore(id) {
+        const titleEl   = document.getElementById('ptitle-'   + id);
+        const contentEl = document.getElementById('pcontent-' + id);
+        const badge     = document.getElementById('txb-'      + id);
+        if (titleEl   && titleEl.dataset.orig)   titleEl.innerText   = titleEl.dataset.orig;
+        if (contentEl && contentEl.dataset.orig) contentEl.innerText = contentEl.dataset.orig;
+        document.querySelectorAll('#tx-pills-' + id + ' .tx-pill').forEach(p => p.classList.remove('active'));
+        if (badge) badge.innerHTML = '';
+    }
+</script>
+
+{% endblock %}

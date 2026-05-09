@@ -1,0 +1,130 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Modifier Utilisateur · EchoCare{% endblock %}
+
+{% block content %}
+    <style>
+        .edit-card {
+            background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.8rem;
+            max-width: 580px; width: 100%;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+        }
+        .edit-card-header { margin-bottom: 1.4rem; }
+        .edit-card-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem; }
+        .edit-card-header p { font-size: 0.8rem; color: var(--text-subtle); margin: 0; }
+        .edit-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+        .edit-field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+        .edit-label {
+            font-size: 0.72rem; font-weight: 700; color: var(--text-subtle);
+            letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 0.4rem;
+        }
+        .edit-input {
+            padding: 0.6rem 0.85rem; border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
+            font-size: 0.875rem; color: var(--text-main); outline: none;
+            transition: border-color 0.2s; width: 100%; font-family: inherit;
+        }
+        .edit-input::placeholder { color: var(--text-subtle); }
+        .edit-input:focus { border-color: var(--primary-color); background: rgba(232, 137, 90,0.05); }
+        .edit-input option { background: #162232; color: white; }
+        .edit-pw-wrap { position: relative; }
+        .edit-pw-wrap .edit-input { padding-right: 2.5rem; }
+        .edit-toggle-pw {
+            position: absolute; right: 0.75rem; top: 50%;
+            transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: var(--text-subtle);
+        }
+        .edit-hint { font-size: 0.72rem; color: var(--text-subtle); margin-top: 0.25rem; }
+        .edit-divider { border: none; border-top: 1px solid var(--border-color); margin: 1rem 0; }
+        .edit-btn-row { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+        .edit-btn-save {
+            flex: 1; padding: 0.65rem; background: var(--primary-color); color: white;
+            border: none; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .edit-btn-save:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .edit-btn-cancel {
+            flex: 1; padding: 0.65rem; background: rgba(255,255,255,0.04); color: var(--text-muted);
+            border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+            font-size: 0.875rem; font-weight: 600; text-decoration: none;
+            text-align: center; transition: all 0.2s;
+        }
+        .edit-btn-cancel:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+        .edit-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: rgba(232, 137, 90,0.12); color: var(--primary-color);
+            border: 1px solid rgba(232, 137, 90,0.25);
+            padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+<div style="display: flex; justify-content: center; width: 100%;">
+<div class="edit-card">
+    <div class="edit-card-header">
+        <span class="edit-badge">✏️ Modification</span>
+        <h2>Modifier {{ user.prenom }} {{ user.nom }}</h2>
+        <p>Modifiez les informations de l'utilisateur</p>
+    </div>
+
+    <form method="post" novalidate>
+        <div class="edit-row-2">
+            <div class="edit-field">
+                <label class="edit-label">Nom</label>
+                <input class="edit-input" type="text" name="nom" value="{{ user.nom }}" required>
+            </div>
+            <div class="edit-field">
+                <label class="edit-label">Prenom</label>
+                <input class="edit-input" type="text" name="prenom" value="{{ user.prenom }}" required>
+            </div>
+        </div>
+
+        <div class="edit-field">
+            <label class="edit-label">Email</label>
+            <input class="edit-input" type="email" name="email" value="{{ user.email }}" required>
+        </div>
+
+        <div class="edit-row-2">
+            <div class="edit-field">
+                <label class="edit-label">Telephone</label>
+                <input class="edit-input" type="text" name="num_tel" value="{{ user.numTel ?? '' }}">
+            </div>
+            <div class="edit-field">
+                <label class="edit-label">Role</label>
+                <select class="edit-input" name="role">
+                    <option value="Patient" {{ user.role == 'Patient' ? 'selected' : '' }}>🌿 Patient</option>
+                    <option value="Coach"   {{ user.role == 'Coach'   ? 'selected' : '' }}>🏋️ Coach</option>
+                    <option value="Admin"   {{ user.role == 'Admin'   ? 'selected' : '' }}>👑 Admin</option>
+                </select>
+            </div>
+        </div>
+
+        <hr class="edit-divider">
+        <p style="color:var(--text-subtle);font-size:0.8rem;margin-bottom:0.75rem;">🔐 Changer le mot de passe</p>
+
+        <div class="edit-field">
+            <label class="edit-label">Nouveau mot de passe</label>
+            <div class="edit-pw-wrap">
+                <input class="edit-input" type="password" name="password" id="pw" placeholder="••••••••">
+                <span class="edit-toggle-pw" onclick="togglePw()">👁️</span>
+            </div>
+            <span class="edit-hint">Laisser vide pour ne pas changer</span>
+        </div>
+
+        <div class="edit-btn-row">
+            <button type="submit" class="edit-btn-save">💾 Enregistrer</button>
+            <a href="{{ path('admin_dashboard') }}" class="edit-btn-cancel">← Annuler</a>
+        </div>
+    </form>
+</div>
+</div>
+
+<script>
+function togglePw() {
+    const input = document.getElementById('pw');
+    const btn = document.querySelector('.toggle-pw');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+</script>
+{% endblock %}

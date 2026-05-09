@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Community Platform — Professional networking and content sharing">
+        <title>{% block title %}Community{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🔮</text></svg>">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/css/style.css?v=2">
+        <link rel="stylesheet" href="/css/ai-chatbot.css?v=10">
+        <script src="https://unpkg.com/lucide@latest"></script>
+        
+        <!-- PACE.js for Lazy-Loading Progress Bar -->
+        <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default/tmpl/pace-theme-minimal.css">
+        
+        <style>
+            /* Smooth Page Load */
+            body { animation: smoothPageLoad 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+            @keyframes smoothPageLoad {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+
+        {% block javascripts %}{% endblock %}
+    </head>
+    <body>
+        <!-- ================================================================
+             AI POST ASSISTANT — Floating Widget (Dark Theme)
+             ================================================================ -->
+        <div class="aicb-widget">
+            <!-- Trigger bubble -->
+            <button id="aicb-trigger" class="aicb-trigger" onclick="toggleAIChatbot()" aria-label="Open AI Post Assistant">
+                <span class="aicb-trigger-icon">✦</span>
+            </button>
+
+            <!-- Panel -->
+            <div id="aicb-panel" class="aicb-panel" style="display:none;" role="dialog" aria-label="AI Post Assistant" data-api-key="{{ gemini_api_key }}">
+                <!-- Header -->
+                <div class="aicb-header">
+                    <div class="aicb-header-left">
+                        <div class="aicb-header-orb">✦</div>
+                        <div>
+                            <p class="aicb-header-title">EchoCare AI</p>
+                            <p class="aicb-header-status">Ready to assist</p>
+                        </div>
+                    </div>
+                    <button class="aicb-btn-close" onclick="toggleAIChatbot()" aria-label="Close Assistant">×</button>
+                </div>
+
+                <!-- ── FORM STATE ── -->
+                <div id="aicb-form" class="aicb-body">
+                    <p class="aicb-welcome">What would you like to share today?</p>
+
+                    <!-- Prompt -->
+                    <div class="aicb-input-wrapper">
+                        <textarea id="aicb-prompt" class="aicb-textarea" placeholder="e.g. Tips for morning anxiety…" rows="3"></textarea>
+                    </div>
+
+                    <button class="aicb-btn-generate" onclick="generateAICBPost()">
+                        Generate Support Post
+                        <span class="aicb-sparkle">✦</span>
+                    </button>
+                </div>
+
+                <!-- ── LOADING STATE ── -->
+                <div id="aicb-loading" class="aicb-body aicb-body-center" style="display:none; flex-direction:column;">
+                    <div class="aicb-spinner">
+                        <div class="aicb-ring aicb-ring-1"></div>
+                        <div class="aicb-ring aicb-ring-2"></div>
+                        <div class="aicb-ring aicb-ring-3"></div>
+                        <div class="aicb-core"></div>
+                    </div>
+                    <p class="aicb-loading-title">Drafting your post…</p>
+                    <div class="aicb-progress">
+                        <div class="aicb-progress-bar"></div>
+                    </div>
+                    <p class="aicb-loading-hint">This usually takes just a few seconds</p>
+                </div>
+
+                <!-- ── ERROR STATE ── -->
+                <div id="aicb-result" class="aicb-result-wrap" style="display:none; flex-direction:column; padding: 20px; text-align: center;">
+                    <p id="aicb-error-text" style="color: #e8895a; font-size: 0.88rem; margin-bottom: 20px;"></p>
+                    <div class="aicb-result-actions">
+                        <button class="aicb-btn-back" onclick="resetAICBForm()" style="width: 100%; justify-content: center;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M19 12H5M12 5l-7 7 7 7"/>
+                            </svg>
+                            Go Back
+                        </button>
+                    </div>
+                </div>
+            </div><!-- /panel -->
+        </div><!-- /aicb-widget -->
+
+
+        {% block body %}{% endblock %}
+
+
+
+        <script>
+            // Handle browser Back/Forward (BfCache)
+            window.addEventListener('pageshow', (e) => {
+            });
+
+            // Initialize Lucide icons
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
+                // FIX: Aggressively remove layout-breaking extension elements
+                const cleanupExtensions = () => {
+                    const selectors = ['chatgpt-sidebar', '#chatgpt-sidebar', '.chatgpt-sidebar', '[data-rendered="true"][data-gpts-theme]'];
+                    selectors.forEach(sel => {
+                        document.querySelectorAll(sel).forEach(el => el.remove());
+                    });
+                };
+                cleanupExtensions();
+                const observer = new MutationObserver(cleanupExtensions);
+                observer.observe(document.body, { childList: true, subtree: true });
+            });
+        </script>
+
+        <!-- ── RANDOM ADVICE MODAL (Global) ── -->
+        <div id="advice-modal" class="advice-modal-overlay">
+            <div class="advice-modal-content">
+                <button class="advice-close-btn" id="advice-close" aria-label="Close">×</button>
+                <div class="advice-icon-wrap">✦</div>
+                <h3 class="advice-title">Wisdom for you</h3>
+                <p id="advice-text" class="advice-text">Drafting wisdom...</p>
+                <button id="advice-listen-btn" class="advice-btn-listen">
+                    Listen Again
+                </button>
+            </div>
+        </div>
+
+        <script src="/js/ai-chatbot.js?v=16" defer></script>
+
+        <style>
+            .advice-modal-overlay {
+                position: fixed !important;
+                top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+                z-index: 2147483647 !important; /* Absolute max z-index */
+                display: none;
+                align-items: center !important;
+                justify-content: center !important;
+                background: rgba(0, 0, 0, 0.6) !important;
+            }
+            .advice-modal-overlay::before {
+                content: "";
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                z-index: -1;
+            }
+            .advice-modal-overlay.show {
+                display: flex !important;
+            }
+            .advice-modal-content {
+                position: relative !important;
+                background: #FFFFFF !important; 
+                width: 90% !important;
+                max-width: 500px !important;
+                padding: 60px 40px !important;
+                border-radius: 40px !important;
+                box-shadow: 0 50px 150px rgba(0, 0, 0, 0.9) !important;
+                color: #000000 !important;
+                text-align: center !important;
+                margin: auto !important;
+                border: 8px solid #F59E0B !important; /* Gigantic Orange Border */
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+            .advice-close-btn {
+                position: absolute !important;
+                top: 20px !important; right: 20px !important;
+                background: #000000 !important;
+                color: #FFFFFF !important;
+                border-radius: 50% !important;
+                width: 44px !important; height: 44px !important;
+                cursor: pointer !important;
+                font-size: 32px !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                border: none !important;
+                line-height: 1 !important;
+            }
+            .advice-icon-wrap {
+                background: #FDE68A !important;
+                width: 90px !important; height: 90px !important;
+                border-radius: 50% !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                margin: 0 auto 30px !important;
+                color: #B45309 !important;
+                font-size: 50px !important;
+            }
+            .advice-title {
+                color: #4B5563 !important;
+                font-size: 1.2rem !important;
+                text-transform: uppercase !important;
+                letter-spacing: 4px !important;
+                margin-bottom: 25px !important;
+                font-weight: 900 !important;
+            }
+            .advice-text {
+                font-size: 1.8rem !important;
+                font-weight: 800 !important;
+                color: #000000 !important;
+                line-height: 1.4 !important;
+                margin-bottom: 40px !important;
+                display: block !important;
+            }
+            .advice-btn-listen {
+                background: #F59E0B !important;
+                color: #FFFFFF !important;
+                padding: 18px 45px !important;
+                border-radius: 100px !important;
+                cursor: pointer !important;
+                font-size: 20px !important;
+                font-weight: 800 !important;
+                border: none !important;
+                box-shadow: 0 10px 30px rgba(245, 158, 11, 0.5) !important;
+            }
+        </style>
+    </body>
+</html>

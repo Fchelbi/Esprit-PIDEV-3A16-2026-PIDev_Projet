@@ -1,0 +1,18 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Edit Comment{% endblock %}
+
+{% block content %}
+<div class="form-container glassmorphism">
+    <h1 class="page-title">Edit Comment</h1>
+
+    {{ include('comment/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <div style="display:flex;gap:0.6rem;margin-top:1.2rem;align-items:center;">
+        <a href="{{ path('app_comment_index') }}" class="btn btn-icon btn-secondary" data-tooltip="Back">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        </a>
+        {{ include('comment/_delete_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}

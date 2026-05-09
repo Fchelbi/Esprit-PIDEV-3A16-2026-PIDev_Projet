@@ -1,0 +1,61 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="users-container">
+    <h1 class="page-title">User Management</h1>
+
+    <div class="users-table-wrapper glassmorphism" style="padding:1.5rem;">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th style="text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td style="color:var(--text-subtle);font-weight:600;">#{{ user.id_user }}</td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:0.7rem;">
+                                <div class="avatar-placeholder" style="width:32px;height:32px;font-size:0.7rem;">{{ user.prenom|slice(0,1) }}{{ user.nom|slice(0,1) }}</div>
+                                <span style="color:var(--text-main);font-weight:600;">{{ user.prenom }} {{ user.nom }}</span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);">{{ user.email }}</td>
+                        <td>
+                            {% if user.role == 'admin' or user.role == 'ROLE_ADMIN' %}
+                                <span class="role-badge role-badge-admin">
+                                    <i data-lucide="shield" style="width:12px;height:12px;"></i>
+                                    Admin
+                                </span>
+                            {% else %}
+                                <span class="role-badge role-badge-user">
+                                    <i data-lucide="user" style="width:12px;height:12px;"></i>
+                                    User
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align:center;">
+                            <button class="btn btn-icon btn-icon-sm btn-action" data-tooltip="View">
+                                <i data-lucide="eye" style="width:14px;height:14px;"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:2.5rem;color:var(--text-subtle);">
+                            No users found
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

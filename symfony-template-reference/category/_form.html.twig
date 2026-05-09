@@ -1,0 +1,7 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-primary" style="gap:0.4rem;">
+        <i data-lucide="check" style="width:16px;height:16px;"></i>
+        {{ button_label|default('Save') }}
+    </button>
+{{ form_end(form) }}

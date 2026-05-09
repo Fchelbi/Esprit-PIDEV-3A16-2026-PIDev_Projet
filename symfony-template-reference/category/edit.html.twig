@@ -1,0 +1,18 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Edit Category{% endblock %}
+
+{% block content %}
+<div class="form-container glassmorphism">
+    <h1 class="page-title">Edit Category</h1>
+
+    {{ include('category/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <div style="display:flex;gap:0.6rem;margin-top:1.2rem;align-items:center;">
+        <a href="{{ path('app_category_index') }}" class="btn btn-icon btn-secondary" data-tooltip="Back">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+        </a>
+        {{ include('category/_delete_form.html.twig') }}
+    </div>
+</div>
+{% endblock %}

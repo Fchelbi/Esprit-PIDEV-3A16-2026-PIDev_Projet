@@ -1,0 +1,148 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Securite · EchoCare Admin{% endblock %}
+
+{% block topbar %}
+    <div class="top-bar" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 24px;">
+        <h2>🔐 Tableau de Bord Securite</h2>
+        <p style="color: #8899AA; margin-top: 5px;">Detection et gestion des tentatives de connexion suspectes</p>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <style>
+        .sec-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+        .sec-stat-card {
+            background: var(--card-bg); border-radius: var(--radius-md); padding: 0.9rem 1rem;
+            border: 1px solid var(--border-color); text-align: center;
+            position: relative; overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .sec-stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+        .sec-stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+        .sec-stat-card.red::after { background: #e74c3c; }
+        .sec-stat-card.orange::after { background: #E8895A; }
+        .sec-stat-card.green::after { background: #27ae60; }
+        .sec-stat-card .icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+        .sec-stat-card .number { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+        .sec-stat-card.red .number { color: #e74c3c; }
+        .sec-stat-card.orange .number { color: #E8895A; }
+        .sec-stat-card.green .number { color: #27ae60; }
+        .sec-stat-card .label { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+        .section-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+
+        .sec-table-wrap { overflow-x: auto; border-radius: var(--radius-md); margin-bottom: 1.5rem; }
+        .sec-table { width: 100%; background: var(--card-bg); border-radius: var(--radius-md); overflow: hidden; border-collapse: collapse; border: 1px solid var(--border-color); }
+        .sec-table thead { background: rgba(0,0,0,0.2); }
+        .sec-table thead th { padding: 0.7rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); border-bottom: 1px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sec-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; }
+        .sec-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .sec-table tbody td { padding: 0.65rem 1rem; font-size: 0.85rem; color: var(--text-muted); }
+
+        .badge-blocked { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.25); padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+        .badge-suspicious { background: rgba(232,137,90,0.15); color: #E8895A; border: 1px solid rgba(232,137,90,0.25); padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+
+        .btn-unblock {
+            padding: 4px 12px; background: rgba(39,174,96,0.12); color: #27ae60;
+            border: 1px solid rgba(39,174,96,0.25); border-radius: 6px;
+            font-size: 0.8rem; cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .btn-unblock:hover { background: rgba(39,174,96,0.25); color: white; }
+        .empty { text-align: center; padding: 2rem; color: var(--text-subtle); font-size: 0.875rem; }
+    </style>
+<div>
+
+    <div class="sec-stats">
+        <div class="sec-stat-card red">
+            <div class="icon">🚫</div>
+            <div class="number">{{ blocked|length }}</div>
+            <div class="label">IPs bloquees</div>
+        </div>
+        <div class="sec-stat-card orange">
+            <div class="icon">⚠️</div>
+            <div class="number">{{ suspicious|length }}</div>
+            <div class="label">Tentatives suspectes</div>
+        </div>
+        <div class="sec-stat-card green">
+            <div class="icon">🛡️</div>
+            <div class="number">5</div>
+            <div class="label">Max tentatives avant blocage</div>
+        </div>
+    </div>
+
+    <div class="section-title">🚫 IPs Bloquees</div>
+    <div class="sec-table-wrap">
+    <table class="sec-table">
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>Email cible</th>
+                <th>Tentatives</th>
+                <th>Bloquee jusqu'a</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if blocked is empty %}
+                <tr><td colspan="6" class="empty">✅ Aucune IP bloquee actuellement</td></tr>
+            {% else %}
+                {% for attempt in blocked %}
+                <tr>
+                    <td style="color:var(--text-main);font-weight:600;">{{ attempt.ip }}</td>
+                    <td>{{ attempt.email ?? '—' }}</td>
+                    <td><span style="color:#e74c3c;font-weight:700;">{{ attempt.attempts }}x</span></td>
+                    <td>{{ attempt.blockedUntil ? attempt.blockedUntil|date('d/m/Y H:i') : '—' }}</td>
+                    <td><span class="badge-blocked">🚫 Bloquee</span></td>
+                    <td>
+                        <form method="post" action="{{ path('admin_unblock', {id: attempt.id}) }}" style="margin:0;">
+                            <button type="submit" class="btn-unblock">✅ Debloquer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    </div>
+
+    <div class="section-title">⚠️ Tentatives Suspectes</div>
+    <div class="sec-table-wrap">
+    <table class="sec-table">
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>Email cible</th>
+                <th>Tentatives</th>
+                <th>Derniere tentative</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if suspicious is empty %}
+                <tr><td colspan="5" class="empty">✅ Aucune activite suspecte</td></tr>
+            {% else %}
+                {% for attempt in suspicious %}
+                <tr>
+                    <td style="color:var(--text-main);font-weight:600;">{{ attempt.ip }}</td>
+                    <td>{{ attempt.email ?? '—' }}</td>
+                    <td><span style="color:#E8895A;font-weight:700;">{{ attempt.attempts }}x</span></td>
+                    <td>{{ attempt.lastAttempt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        {% if attempt.isBlocked %}
+                            <span class="badge-blocked">🚫 Bloquee</span>
+                        {% else %}
+                            <span class="badge-suspicious">⚠️ Suspecte</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{% endblock %}

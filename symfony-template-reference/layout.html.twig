@@ -1,0 +1,633 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if 'admin' in app.request.attributes.get('_route') %}Admin Panel{% else %}Community{% endif %}{% endblock %}
+
+{% block body %}
+<style>
+    html, body {
+        background-color: #0d1321 !important;
+        background: radial-gradient(circle at 50% 20%, #152238 0%, #0d1321 80%, #080c16 100%) fixed !important;
+        min-height: 100vh;
+        height: auto;
+    }
+</style>
+
+{% if is_granted('ROLE_ADMIN') %}
+{# ── Mobile toggle button (only needed for admin sidebar) ── #}
+<button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle sidebar">
+    <i data-lucide="menu"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+{% endif %}
+
+<div class="layout-wrapper">
+
+    {# ══════════════════════════════════════════════
+       ADMIN SIDEBAR — only for ROLE_ADMIN
+       ══════════════════════════════════════════════ #}
+    {% if is_granted('ROLE_ADMIN') %}
+    <aside class="sidebar glassmorphism">
+        <div class="sidebar-header">
+            <p class="sidebar-logo">Echo<span style="color:var(--primary-color)">Care</span></p>
+            <p class="sidebar-subtitle">Admin Panel</p>
+        </div>
+
+        <div class="sidebar-search">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <form method="get" action="{{ path('app_post_index') }}" style="width:100%;">
+                    <input type="search" name="q" placeholder="Search…" class="search-input" style="width:100%;" value="{{ app.request.query.get('q')|default('') }}">
+                </form>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <p class="nav-section-title">Overview</p>
+                <a href="{{ path('app_admin_dashboard') }}" class="nav-item {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="{{ path('admin_analytics') }}" class="nav-item {% if app.request.attributes.get('_route') == 'admin_analytics' %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
+                    <span class="nav-label">Analytics</span>
+                </a>
+            </div>
+
+            <div class="nav-section nav-section-divider">
+                <p class="nav-section-title">Users</p>
+                <a href="{{ path('admin_dashboard') }}" class="nav-item {% if app.request.attributes.get('_route') in ['admin_dashboard', 'admin_user_new', 'admin_user_edit'] %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="users"></i></span>
+                    <span class="nav-label">User Management</span>
+                </a>
+                <a href="{{ path('admin_security') }}" class="nav-item {% if app.request.attributes.get('_route') == 'admin_security' %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="shield"></i></span>
+                    <span class="nav-label">Security</span>
+                </a>
+            </div>
+
+            <div class="nav-section nav-section-divider">
+                <p class="nav-section-title">Forum</p>
+                <a href="{{ path('app_admin_forum') }}" class="nav-item {% if 'app_admin_forum' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="message-square"></i></span>
+                    <span class="nav-label">Forum Admin</span>
+                </a>
+                <a href="{{ path('app_admin_moderation') }}" class="nav-item {% if app.request.attributes.get('_route') == 'app_admin_moderation' %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="shield-check"></i></span>
+                    <span class="nav-label">Moderation</span>
+                </a>
+                <a href="{{ path('app_post_index') }}" class="nav-item {% if app.request.attributes.get('_route') == 'app_post_index' %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="newspaper"></i></span>
+                    <span class="nav-label">Public Forum</span>
+                </a>
+            </div>
+
+            <div class="nav-section nav-section-divider">
+                <p class="nav-section-title">Reports</p>
+                <a href="{{ path('admin_export_pdf') }}" class="nav-item nav-item-pdf">
+                    <span class="nav-icon"><i data-lucide="file-down"></i></span>
+                    <span class="nav-label">Export PDF Report</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar" style="width:36px;height:36px;background:#E8895A;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;">
+                    {{ app.user.prenom|slice(0,1)|upper }}
+                </div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name">{{ app.user.prenom }} {{ app.user.nom }}</p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+                <a href="{{ path('app_logout') }}" class="btn-logout-nav" title="Logout" style="padding:8px;flex-shrink:0;">
+                    <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+    {% endif %}
+
+    {# ══════════════════════════════════════════════
+       MAIN CONTENT
+       ══════════════════════════════════════════════ #}
+    <main class="main-content" {% if not is_granted('ROLE_ADMIN') %}style="padding-top:0;"{% endif %}>
+        <div class="content-container">
+
+                    {# topbar: admin templates provide their own page-header override;
+               patient/coach get the default navbar when they don't override it #}
+            {% block topbar %}
+            {% if not is_granted('ROLE_ADMIN') %}
+            <nav class="navbar glassmorphism" style="border-radius:0 0 16px 16px;border-top:none;margin-top:0;">
+                <div class="navbar-logo">Echo<span>Care</span></div>
+
+                <div class="top-bar-search">
+                    <div class="search-container glassmorphism" style="border-radius:30px;padding:0.2rem;background:rgba(255,255,255,0.03);">
+                        <form method="get" action="{{ path('app_post_index') }}">
+                            <div class="search-wrapper" style="margin:0;">
+                                <i data-lucide="search" class="search-icon" style="color:var(--text-subtle);"></i>
+                                <input type="search" name="q" placeholder="Search community…" class="search-input" value="{{ app.request.query.get('q')|default('') }}" style="border:none;background:transparent;width:100%;padding-left:2.8rem;border-radius:30px;font-size:0.85rem;">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="navbar-links">
+                    <a href="{{ path('patient_dashboard') }}" class="{% if app.request.attributes.get('_route') == 'patient_dashboard' %}active{% endif %}">Accueil</a>
+                    <a href="{{ path('patient_bien_etre') }}" class="{% if 'bien_etre' in app.request.attributes.get('_route') %}active{% endif %}">Bien-être</a>
+
+                    <div class="nav-dropdown">
+                        <a href="{{ path('app_post_index') }}" class="nav-dropbtn {% if 'post' in app.request.attributes.get('_route') or 'category' in app.request.attributes.get('_route') %}active{% endif %}" style="display:flex;align-items:center;gap:4px;">
+                            Forum <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+                        </a>
+                        <div class="dropdown-menu glassmorphism">
+                            <a href="{{ path('app_post_index') }}"><i data-lucide="newspaper"></i> Forum Feed</a>
+                            <a href="{{ path('app_post_new') }}"><i data-lucide="plus-circle"></i> Create Post</a>
+                            <a href="{{ path('app_category_index') }}"><i data-lucide="tag"></i> Categories</a>
+                        </div>
+                    </div>
+
+                    <a href="{{ path('patient_profile') }}" class="{% if 'profile' in app.request.attributes.get('_route') %}active{% endif %}">Mon profil</a>
+                </div>
+
+                <div class="navbar-right">
+                    <div class="user-pill-nav">
+                        <div class="avatar">{{ app.user.prenom|slice(0,1)|upper }}</div>
+                        <span>{{ app.user.prenom }}</span>
+                    </div>
+                    <a href="{{ path('app_logout') }}" class="btn-logout-nav" title="Déconnexion">
+                        <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+                    </a>
+                </div>
+            </nav>
+            {% endif %}
+            {% endblock %}
+
+            {% for label, messages in app.flashes %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<style>
+    .layout-wrapper {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+        width: 270px;
+        min-width: 270px;
+        height: 100vh;
+        background: rgba(13, 21, 35, 0.98);
+        border-right: 1px solid rgba(255,255,255,0.06);
+        overflow-y: auto;
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 30px rgba(0,0,0,0.4);
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .sidebar-header {
+        padding: 1.8rem 1.5rem 1.3rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-logo {
+        color: var(--text-main);
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .sidebar-subtitle {
+        color: var(--text-subtle);
+        margin: 0.25rem 0 0;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    .sidebar-search {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .search-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.8rem;
+        width: 15px;
+        height: 15px;
+        color: var(--text-subtle);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .search-wrapper .search-input { padding-left: 2.4rem; }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 0.75rem 0;
+        overflow-y: auto;
+    }
+
+    .nav-section { margin-bottom: 0.25rem; }
+
+    .nav-section-title {
+        color: var(--text-subtle);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin: 1rem 0 0.4rem;
+        padding: 0 1.2rem;
+        font-weight: 700;
+    }
+
+    .nav-section-divider {
+        margin-top: 0.5rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.7rem 1.2rem;
+        margin: 0.1rem 0.65rem;
+        color: rgba(180,195,215,0.7);
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+        transform: translateX(3px);
+    }
+
+    .nav-item-pdf {
+        background: rgba(232,137,90,0.08);
+        color: #E8895A !important;
+        border: 1px dashed rgba(232,137,90,0.3);
+        margin-top: 4px;
+    }
+    .nav-item-pdf:hover {
+        background: rgba(232,137,90,0.18) !important;
+        border-color: rgba(232,137,90,0.6);
+    }
+
+    .nav-item.active {
+        background: rgba(232,137,90,0.1);
+        color: #E8895A;
+        font-weight: 700;
+        border-left-color: #E8895A;
+    }
+
+    .nav-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .nav-icon svg { width: 17px; height: 17px; }
+    .nav-label { flex: 1; }
+
+    .sidebar-footer {
+        margin-top: auto;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.1rem 1.2rem;
+    }
+
+    .sidebar-user-info { flex: 1; min-width: 0; }
+
+    .sidebar-user-name {
+        margin: 0;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sidebar-user-role {
+        margin: 0.15rem 0 0;
+        color: #E8895A;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main-content {
+        flex: 1 1 0%;
+        min-width: 0;
+        min-height: 100vh;
+        padding: 2rem 2.5rem;
+        overflow-x: hidden;
+        background: radial-gradient(circle at 50% 20%, #152238 0%, #0d1321 80%, #080c16 100%);
+        background-color: #0d1321;
+        background-attachment: fixed;
+        animation: pageTransition 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+        opacity: 0;
+    }
+
+    .content-container {
+        max-width: 1150px;
+        margin: 0 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flash-messages { margin: 0 0 1rem; }
+
+    .alert {
+        padding: 0.9rem 1.2rem;
+        margin-bottom: 0.6rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .alert-success { background: rgba(52,211,153,0.1); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+    .alert-error   { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+    .alert-info    { background: rgba(96,165,250,0.1);  color: #93c5fd; border: 1px solid rgba(96,165,250,0.2); }
+    .alert-warning { background: rgba(251,191,36,0.1);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+
+    /* ─── NAVBAR (patient/coach) ─── */
+    .navbar {
+        background: rgba(15,25,42,0.95);
+        padding: 0 40px;
+        height: 68px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(12px);
+    }
+
+    .navbar-logo { font-size: 20px; font-weight: 800; color: white; letter-spacing: -0.3px; }
+    .navbar-logo span { color: #E8895A; }
+    .navbar-links { display: flex; gap: 24px; align-items: center; }
+    .navbar-links a {
+        color: rgba(180,195,215,0.75);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 500;
+        transition: color 0.2s;
+        position: relative;
+    }
+    .navbar-links a::after {
+        content: '';
+        position: absolute; bottom: -4px; left: 0;
+        width: 0; height: 2px;
+        background: #E8895A;
+        transition: width 0.3s;
+    }
+    .navbar-links a:hover { color: white; }
+    .navbar-links a:hover::after,
+    .navbar-links a.active::after { width: 100%; }
+    .navbar-links a.active { color: white; font-weight: 600; }
+    .navbar-right { display: flex; align-items: center; gap: 14px; }
+    .user-pill-nav {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.05); padding: 6px 14px;
+        border-radius: 30px; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .user-pill-nav .avatar {
+        width: 28px; height: 28px; background: #E8895A;
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; color: white; font-size: 12px; font-weight: 700;
+    }
+    .user-pill-nav span { font-size: 12px; color: #CBD5E0; font-weight: 600; }
+    .btn-logout-nav {
+        padding: 7px 14px;
+        background: rgba(231,76,60,0.12);
+        color: #e74c3c;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(231,76,60,0.2);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .btn-logout-nav:hover { background: rgba(231,76,60,0.28); }
+
+    .top-bar-search { flex: 1; max-width: 380px; margin: 0 1.5rem; }
+
+    .search-container {
+        width: 100%;
+        transition: box-shadow 0.2s;
+    }
+    .search-container:focus-within {
+        box-shadow: 0 0 0 2px rgba(232,137,90,0.4);
+    }
+    .search-input:focus { box-shadow: none !important; }
+
+    /* Dropdown */
+    .nav-dropdown { position: relative; display: inline-block; }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 210px;
+        background: rgba(13,21,35,0.97);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 0.7rem;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        z-index: 200;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        display: block;
+        animation: slideInDown 0.18s ease forwards;
+    }
+
+    .dropdown-menu a {
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        padding: 0.7rem 0.9rem !important;
+        color: rgba(180,195,215,0.8) !important;
+        text-decoration: none;
+        font-size: 0.875rem !important;
+        border-radius: 9px;
+        transition: all 0.15s;
+    }
+
+    .dropdown-menu a:hover {
+        background: rgba(255,255,255,0.05);
+        color: white !important;
+        transform: translateX(4px);
+    }
+
+    .dropdown-menu a svg { width: 15px; height: 15px; color: #E8895A; }
+    .dropdown-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 0.5rem; }
+
+    @keyframes slideInDown {
+        from { opacity: 0; transform: translate(-50%, -8px); }
+        to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ─── SCROLLBARS ─── */
+    .sidebar::-webkit-scrollbar,
+    .main-content::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track,
+    .main-content::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb,
+    .main-content::-webkit-scrollbar-thumb { background: rgba(232,137,90,0.2); border-radius: 2px; }
+    .sidebar::-webkit-scrollbar-thumb:hover,
+    .main-content::-webkit-scrollbar-thumb:hover { background: rgba(232,137,90,0.4); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes pageTransition {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes diagonalSlide {
+        0%   { transform: translate(-100%, 100%) rotate(-45deg); opacity: 0; }
+        50%  { opacity: 0.5; }
+        100% { transform: translate(100%, -100%) rotate(-45deg); opacity: 0; }
+    }
+
+    /* ─── MOBILE TOGGLE ─── */
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem; left: 1rem;
+        z-index: 200;
+        background: rgba(13,21,35,0.95);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--text-main);
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        backdrop-filter: blur(8px);
+        align-items: center; justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+        opacity: 0;
+        transition: opacity 0.25s;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+        .mobile-menu-toggle { display: flex; }
+        .layout-wrapper { position: relative; }
+
+        .sidebar {
+            position: fixed;
+            left: -285px; top: 0; bottom: 0;
+            z-index: 100;
+            transition: left 0.3s cubic-bezier(0.34,1.3,0.64,1);
+            width: 270px;
+        }
+
+        .sidebar.active { left: 0; }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        .main-content { padding: 4.5rem 1.25rem 1.5rem !important; }
+    }
+
+    @media (max-width: 768px) {
+        .main-content { padding: 4.5rem 1rem 1rem !important; }
+        .navbar { padding: 0 16px; }
+        .top-bar-search { display: none; }
+        .navbar-links { gap: 14px; }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Soft page transitions
+        document.querySelectorAll('a[href]').forEach(link => {
+            if (link.hostname === window.location.hostname && !link.hash && !link.target && link.getAttribute('href') !== '#') {
+                link.addEventListener('click', (e) => {
+                    const overlay = document.querySelector('.page-transition-overlay');
+                    const shape   = document.querySelector('.transition-shape');
+                    if (overlay && shape) {
+                        e.preventDefault();
+                        shape.style.animation = 'none';
+                        void shape.offsetWidth;
+                        shape.style.animation = 'diagonalSlide 0.5s cubic-bezier(0.77,0,0.175,1) forwards';
+                        setTimeout(() => { window.location.href = link.href; }, 250);
+                    }
+                });
+            }
+        });
+
+        // Mobile sidebar toggle
+        const toggleBtn = document.getElementById('mobileMenuToggle');
+        const sidebar   = document.querySelector('.sidebar');
+        const overlay   = document.getElementById('sidebarOverlay');
+
+        if (toggleBtn && sidebar && overlay) {
+            const toggle = () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            };
+            toggleBtn.addEventListener('click', toggle);
+            overlay.addEventListener('click', toggle);
+        }
+    });
+</script>
+
+{% endblock %}
