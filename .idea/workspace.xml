@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="89423c0b-2e84-4795-b88f-78f5921e6b29" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/pidev/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/java/controllers/ChatbotController.java" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/pidev/src/main/java/controllers/ChatbotController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/java/controllers/PatientHome.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/java/services/Servicechathistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/pidev/src/main/java/services/Servicechathistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/java/services/YouTubeAPIService.java" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/pidev/src/main/java/services/YouTubeAPIService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/resources/AdminHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/pidev/src/main/resources/AdminHome.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pidev/pidev/src/main/resources/PatientHome.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/pidev/pidev/src/main/resources/PatientHome.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="242" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Fchelbi"
+  }
+}]]></component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="main" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Fchelbi/Esprit-PIDEV-3A16-2026-PIDev_Projet.git",
+    "accountId": "58ebee59-460d-4bd6-8973-6c982988d8b1"
+  }
+}]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="3AWn0gfmrri57HRtpQGkuHHmrj6" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "#2 on formation",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/fatmachelbi/uni_project/pidev_java",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="89423c0b-2e84-4795-b88f-78f5921e6b29" name="Changes" comment="" />
+      <created>1772716972413</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772716972413</updated>
+      <workItem from="1772716973601" duration="81000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
