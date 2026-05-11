@@ -629,4 +629,14 @@ public class AdminHome {
             } catch (IOException e) { e.printStackTrace(); }
         }
     }
+    @FXML
+    void analyzeWithAI(MouseEvent event) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("🤖 Analyse IA");
+        a.setHeaderText("Fonctionnalité IA");
+        a.setContentText("Analyse IA disponible dans la version complète.");
+        a.showAndWait();
+    }
+
+
 }
