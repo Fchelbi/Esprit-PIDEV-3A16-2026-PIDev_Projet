@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="95a322f3-43cc-42f5-a58c-56e4f25eb5a7" name="Changes" comment="commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/FormationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/FormationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Passwordutil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Passwordutil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +97,7 @@
       <workItem from="1771980557105" duration="237000" />
       <workItem from="1771980865925" duration="265000" />
       <workItem from="1771981276716" duration="108000" />
-      <workItem from="1778500966817" duration="3838000" />
+      <workItem from="1778500966817" duration="7899000" />
     </task>
     <task id="LOCAL-00001" summary="commit">
       <option name="closed" value="true" />
@@ -104,7 +107,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778331019954</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="commit">
+      <option name="closed" value="true" />
+      <created>1778507149825</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1778507149825</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

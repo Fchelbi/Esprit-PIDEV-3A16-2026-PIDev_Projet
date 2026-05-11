@@ -59,7 +59,7 @@ public class FormationController implements Initializable {
     private CertificateService certificateService;
     private QuizGeneratorAPI   quizGeneratorAPI;
     private serviceUser        userService;
-
+    private services.YouTubeAPIService youtubeService;
     private ObservableList<Formation> formationData = FXCollections.observableArrayList();
     private Formation selectedFormation = null; // formation being edited
     private int coachId = 0; // 0 = admin (all), >0 = coach (own only)
@@ -307,38 +307,107 @@ public class FormationController implements Initializable {
 
     @FXML
     private void handleSearchYouTube() {
-        String url = tfVideoUrl.getText().trim();
-        if (url.isEmpty() || !VideoPlayerUtil.isYouTubeUrl(url)) {
-            showError(lblError, "Entrez une URL YouTube valide d'abord.");
-            return;
+        // Initialize YouTubeAPIService if not already done
+        if (youtubeService == null) {
+            youtubeService = new services.YouTubeAPIService();
         }
-        lblError.setText("⏳ Validation YouTube...");
-        new Thread(() -> {
-            try {
-                String apiUrl = "https://www.youtube.com/oembed?url=" + url + "&format=json";
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection)
-                        new java.net.URL(apiUrl).openConnection();
-                conn.setConnectTimeout(6000); conn.setReadTimeout(8000);
-                if (conn.getResponseCode() == 200) {
-                    java.io.BufferedReader br = new java.io.BufferedReader(
-                            new java.io.InputStreamReader(conn.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) sb.append(line);
-                    String json = sb.toString();
-                    int ti = json.indexOf("\"title\":\"");
-                    String title = ti >= 0 ? json.substring(ti + 9, json.indexOf("\"", ti + 9)) : "Titre inconnu";
-                    Platform.runLater(() -> lblError.setStyle("-fx-text-fill:#00b894;"));
-                    Platform.runLater(() -> lblError.setText("✅ Vidéo trouvée : " + title));
-                } else {
-                    Platform.runLater(() -> showError(lblError, "❌ URL YouTube invalide ou vidéo introuvable."));
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> showError(lblError, "❌ Erreur réseau : " + e.getMessage()));
-            }
-        }, "yt-validate-thread").start();
-    }
 
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("🔍 Rechercher sur YouTube");
+        dialog.setHeaderText("Rechercher une vidéo pour votre formation");
+
+        ButtonType selectBtn = new ButtonType("Sélectionner", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(selectBtn, ButtonType.CANCEL);
+        dialog.getDialogPane().setPrefWidth(640);
+        dialog.getDialogPane().setPrefHeight(540);
+
+        // Search field
+        TextField tfQuery = new TextField();
+        tfQuery.setPromptText("Ex: stress management, communication skills...");
+        tfQuery.setStyle("-fx-padding:10;-fx-font-size:14px;-fx-background-radius:8;"
+                + "-fx-border-color:#E2E8F0;-fx-border-radius:8;-fx-border-width:1.5;");
+
+        Button btnSearch = new Button("🔍 Chercher");
+        btnSearch.setStyle("-fx-background-color:#d63031;-fx-text-fill:white;"
+                + "-fx-font-weight:bold;-fx-padding:10 20;-fx-background-radius:8;-fx-cursor:hand;");
+
+        HBox searchRow = new HBox(10, tfQuery, btnSearch);
+        searchRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(tfQuery, Priority.ALWAYS);
+
+        Label lblStatus = new Label("");
+        lblStatus.setStyle("-fx-font-size:12px;-fx-text-fill:#718096;");
+
+        // Results list
+        ListView<services.YouTubeAPIService.YouTubeVideo> listResults = new ListView<>();
+        listResults.setPrefHeight(380);
+        VBox.setVgrow(listResults, Priority.ALWAYS);
+        listResults.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(services.YouTubeAPIService.YouTubeVideo item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setText(null); setGraphic(null); return; }
+                VBox cell = new VBox(3);
+                cell.setPadding(new Insets(6));
+                Label tl = new Label("🎬 " + item.title);
+                tl.setStyle("-fx-font-weight:bold;-fx-font-size:13px;-fx-text-fill:#2D3748;");
+                tl.setWrapText(true);
+                Label cl = new Label("📺 " + item.channelTitle);
+                cl.setStyle("-fx-text-fill:#718096;-fx-font-size:11px;");
+                cell.getChildren().addAll(tl, cl);
+                setGraphic(cell);
+            }
+        });
+
+        VBox content = new VBox(10, searchRow, lblStatus, listResults);
+        content.setPadding(new Insets(16));
+        dialog.getDialogPane().setContent(content);
+
+        // Search action — called on button click or Enter key
+        Runnable doSearch = () -> {
+            String query = tfQuery.getText().trim();
+            if (query.length() < 2) {
+                lblStatus.setText("❌ Entrez au moins 2 caractères");
+                return;
+            }
+            lblStatus.setText("⏳ Recherche en cours...");
+            listResults.getItems().clear();
+            new Thread(() -> {
+                try {
+                    List<services.YouTubeAPIService.YouTubeVideo> results =
+                            youtubeService.searchVideos(query, 10);
+                    javafx.application.Platform.runLater(() -> {
+                        listResults.getItems().addAll(results);
+                        lblStatus.setText("✅ " + results.size() + " résultat(s) trouvé(s)");
+                    });
+                } catch (Exception ex) {
+                    javafx.application.Platform.runLater(() ->
+                            lblStatus.setText("❌ Erreur : " + ex.getMessage()));
+                }
+            }, "yt-search-thread").start();
+        };
+
+        btnSearch.setOnAction(e -> doSearch.run());
+        tfQuery.setOnAction(e -> doSearch.run());
+
+        // Pre-fill search with formation title if available
+        if (selectedFormation != null && !selectedFormation.getTitle().isBlank()) {
+            tfQuery.setText(selectedFormation.getTitle());
+        }
+
+        dialog.setResultConverter(btn -> {
+            if (btn == selectBtn) {
+                services.YouTubeAPIService.YouTubeVideo sel =
+                        listResults.getSelectionModel().getSelectedItem();
+                return sel != null ? sel.youtubeUrl : null;
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(youtubeUrl -> {
+            if (tfVideoUrl != null) tfVideoUrl.setText(youtubeUrl);
+        });
+    }
     // ════════════════════════════════════════════════════════════════════
     //  QUIZ PANEL
     // ════════════════════════════════════════════════════════════════════
