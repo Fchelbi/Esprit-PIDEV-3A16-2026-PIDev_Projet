@@ -217,4 +217,30 @@ public class CommentService implements CrudService<Comment> {
 
         return 0;
     }
+    public int countComments() {
+        return countQuery("SELECT COUNT(*) FROM comment");
+    }
+
+    public int totalCommentLikes() {
+        return countQuery("SELECT COUNT(*) FROM comment_likes");
+    }
+
+    public int totalCommentDislikes() {
+        return countQuery("SELECT COUNT(*) FROM comment_dislikes");
+    }
+
+    private int countQuery(String sql) {
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[Comment Stats] Query error: " + e.getMessage());
+        }
+
+        return 0;
+    }
 }

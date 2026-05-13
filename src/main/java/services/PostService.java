@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class PostService implements CrudService<Post> {
 
     private final Connection connection;
@@ -216,5 +217,46 @@ public class PostService implements CrudService<Post> {
             ps.setInt(3, postId);
             ps.executeUpdate();
         }
+    }
+    public int countPosts() {
+        return countQuery("SELECT COUNT(*) FROM post");
+    }
+
+    public int countFlaggedPosts() {
+        return countQuery("SELECT COUNT(*) FROM post WHERE is_flagged = 1 OR moderation_status = 'flagged'");
+    }
+
+    public int totalPostLikes() {
+        return countQuery("SELECT COUNT(*) FROM post_likes");
+    }
+
+    public int totalPostDislikes() {
+        return countQuery("SELECT COUNT(*) FROM post_dislikes");
+    }
+
+    public int countActiveForumUsers() {
+        return countQuery("""
+            SELECT COUNT(DISTINCT user_id)
+            FROM (
+                SELECT user_id FROM post
+                UNION
+                SELECT user_id FROM comment
+            ) AS active_users
+            """);
+    }
+
+    private int countQuery(String sql) {
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[Stats] Query error: " + e.getMessage());
+        }
+
+        return 0;
     }
 }

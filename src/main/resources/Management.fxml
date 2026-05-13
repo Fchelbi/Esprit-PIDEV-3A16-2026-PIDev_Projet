@@ -1,20 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
-<HBox xmlns:fx="http://javafx.com/fxml/1" minHeight="720">
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ManagementController"
+      minHeight="720">
 
     <fx:include source="Sidebar.fxml"/>
 
-    <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="14"
-          style="-fx-background-color: #F2F0EC;">
-        <Label text="💬" style="-fx-font-size: 56;"/>
-        <Label text="Forum Admin"
-               style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
-        <Label text="Stats, charts and AI moderation will live here. Coming in phase 2."
-               style="-fx-font-size: 13; -fx-text-fill: #718096;"/>
+    <VBox HBox.hgrow="ALWAYS"
+          spacing="26"
+          style="-fx-background-color: #F2F0EC; -fx-padding: 36;">
+
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <VBox spacing="4">
+                <Label text="Forum Admin"
+                       style="-fx-font-size: 28; -fx-font-weight: bold; -fx-text-fill: #3F6094;"/>
+                <Label text="Manage forum posts, comments, reactions and statistics."
+                       style="-fx-font-size: 14; -fx-text-fill: #F2935E;"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Export PDF Report"
+                    onAction="#onExportPdf"
+                    style="-fx-background-color: #E8956D; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 12 22 12 22;"/>
+        </HBox>
+
+        <!-- Cards row -->
+        <HBox spacing="18">
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="TOTAL POSTS"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblTotalPosts"
+                       text="0"
+                       style="-fx-text-fill: #E8956D; -fx-font-size: 32; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="TOTAL COMMENTS"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblTotalComments"
+                       text="0"
+                       style="-fx-text-fill: #68D391; -fx-font-size: 32; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="ACTIVE USERS"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblActiveUsers"
+                       text="0"
+                       style="-fx-text-fill: #F6E27A; -fx-font-size: 32; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="FLAGGED POSTS"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblFlaggedPosts"
+                       text="0"
+                       style="-fx-text-fill: #F6AD55; -fx-font-size: 32; -fx-font-weight: bold;"/>
+            </VBox>
+
+        </HBox>
+
+        <!-- Reactions row -->
+        <HBox spacing="18">
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="POST LIKES"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblPostLikes"
+                       text="0"
+                       style="-fx-text-fill: #F6E27A; -fx-font-size: 30; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="POST DISLIKES"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblPostDislikes"
+                       text="0"
+                       style="-fx-text-fill: #FC8181; -fx-font-size: 30; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="COMMENT LIKES"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblCommentLikes"
+                       text="0"
+                       style="-fx-text-fill: #68D391; -fx-font-size: 30; -fx-font-weight: bold;"/>
+            </VBox>
+
+            <VBox spacing="8"
+                  style="-fx-background-color: #3F6094; -fx-background-radius: 16; -fx-padding: 24;"
+                  prefWidth="230">
+                <Label text="COMMENT DISLIKES"
+                       style="-fx-text-fill: #A0AEC0; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                <Label fx:id="lblCommentDislikes"
+                       text="0"
+                       style="-fx-text-fill: #FC8181; -fx-font-size: 30; -fx-font-weight: bold;"/>
+            </VBox>
+
+        </HBox>
+
     </VBox>
 
 </HBox>
