@@ -99,23 +99,6 @@
         </VBox>
     </HBox>
 
-    <!-- ── REPORTS section ── -->
-    <Label text="REPORTS"
-           style="-fx-text-fill: rgba(255,255,255,0.45); -fx-font-size: 9;
-                  -fx-letter-spacing: 2; -fx-padding: 20 0 8 20;"/>
-
-    <!-- Export PDF (orange-highlighted row) -->
-    <HBox alignment="CENTER_LEFT" onMouseClicked="#onExportPDF"
-          style="-fx-background-color: rgba(232,149,109,0.15); -fx-cursor: hand;">
-        <HBox prefWidth="4" minHeight="42" style="-fx-background-color: #E8956D;"/>
-        <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS"
-              style="-fx-padding: 10 16 10 12;">
-            <Label text="📄" style="-fx-font-size: 14;"/>
-            <Label text="Statistics"
-                   style="-fx-text-fill: #E8956D; -fx-font-size: 13;"/>
-        </HBox>
-    </HBox>
-
     <!-- ── Spacer ── -->
     <Region VBox.vgrow="ALWAYS"/>
 

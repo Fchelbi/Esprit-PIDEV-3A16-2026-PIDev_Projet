@@ -48,12 +48,12 @@
             <VBox spacing="22" style="-fx-padding: 25 30 35 30;">
 
                 <!-- Posts Management card -->
-                <VBox style="-fx-background-color: white; -fx-background-radius: 14;
+                <VBox style="-fx-background-color: #FFD1B3; -fx-background-radius: 14;
                              -fx-padding: 22;
                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 2);">
                     <Label text="📋  Posts Management"
                            style="-fx-font-size: 16; -fx-font-weight: bold;
-                                  -fx-text-fill: #2D3748; -fx-padding: 0 0 14 0;"/>
+                                  -fx-text-fill: #1A202C; -fx-padding: 0 0 14 0;"/>
                     <TableView fx:id="tblPosts" prefHeight="320">
                         <columns>
                             <TableColumn fx:id="colPostId"       text="ID"       prefWidth="60"/>
@@ -68,12 +68,12 @@
                 </VBox>
 
                 <!-- Comments Management card -->
-                <VBox style="-fx-background-color: white; -fx-background-radius: 14;
+                <VBox style="-fx-background-color: #FFD1B3; -fx-background-radius: 14;
                              -fx-padding: 22;
                              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 2);">
                     <Label text="💬  Comments Management"
                            style="-fx-font-size: 16; -fx-font-weight: bold;
-                                  -fx-text-fill: #2D3748; -fx-padding: 0 0 14 0;"/>
+                                  -fx-text-fill: #1A202C; -fx-padding: 0 0 14 0;"/>
                     <TableView fx:id="tblComments" prefHeight="320">
                         <columns>
                             <TableColumn fx:id="colCommentId"      text="ID"      prefWidth="60"/>
