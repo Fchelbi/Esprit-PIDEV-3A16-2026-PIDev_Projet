@@ -9,6 +9,10 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 
+import javafx.stage.FileChooser;
+import services.PdfExportService;
+import java.io.File;
+
 public class ManagementController {
 
     @FXML private Label lblTotalPosts;
@@ -24,6 +28,7 @@ public class ManagementController {
     @FXML private LineChart<String, Number> postsActivityChart;
     @FXML private PieChart postsByCategoryChart;
 
+    private final PdfExportService pdfExportService = new PdfExportService();
     private final PostService postService = new PostService();
     private final CommentService commentService = new CommentService();
 
@@ -72,10 +77,45 @@ public class ManagementController {
 
     @FXML
     private void onExportPdf() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("PDF Export");
-        alert.setHeaderText(null);
-        alert.setContentText("PDF export will be added in the next feature.");
-        alert.showAndWait();
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Forum PDF Report");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+            );
+            fileChooser.setInitialFileName("forum-statistics-report.pdf");
+
+            File file = fileChooser.showSaveDialog(null);
+
+            if (file == null) {
+                return;
+            }
+
+            pdfExportService.exportForumReport(
+                    file.getAbsolutePath(),
+                    postService.countPosts(),
+                    commentService.countComments(),
+                    postService.countActiveForumUsers(),
+                    postService.countFlaggedPosts(),
+                    postService.totalPostLikes(),
+                    postService.totalPostDislikes(),
+                    commentService.totalCommentLikes(),
+                    commentService.totalCommentDislikes(),
+                    postService
+            );
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("PDF Export");
+            alert.setHeaderText(null);
+            alert.setContentText("PDF exported successfully:\n" + file.getAbsolutePath());
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("PDF Export Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Failed to export PDF:\n" + e.getMessage());
+            alert.showAndWait();
+        }
     }
 }
