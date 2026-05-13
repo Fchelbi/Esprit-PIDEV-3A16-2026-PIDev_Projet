@@ -209,6 +209,20 @@ public class PostDetailController {
         VBox textBox = new VBox(4, metaRow, lblContent);
         textBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(textBox, Priority.ALWAYS);
+        //like dislike comments
+        String reactionStyle =
+                "-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0; " +
+                        "-fx-background-radius: 10; -fx-border-radius: 10; " +
+                        "-fx-cursor: hand; -fx-padding: 4 10 4 10; -fx-font-size: 11;";
+
+        Button btnLike = new Button("👍 " + commentService.countCommentLikes(c.getId()));
+        Button btnDislike = new Button("👎 " + commentService.countCommentDislikes(c.getId()));
+
+        btnLike.setStyle(reactionStyle);
+        btnDislike.setStyle(reactionStyle);
+
+        btnLike.setOnAction(e -> handleLikeComment(c));
+        btnDislike.setOnAction(e -> handleDislikeComment(c));
 
         // Edit button — comment owner only
         Button btnEdit = new Button("✎");
@@ -234,13 +248,22 @@ public class PostDetailController {
         btnDelete.setVisible(canDelete);
         btnDelete.setManaged(canDelete);
 
-        HBox card = new HBox(12, avatar, textBox, btnEdit, btnDelete);
+        HBox card = new HBox(12, avatar, textBox, btnLike, btnDislike, btnEdit, btnDelete);
         card.setAlignment(Pos.CENTER_LEFT);
         card.setStyle(
                 "-fx-background-color: white; -fx-background-radius: 10; " +
                 "-fx-padding: 14; " +
                 "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0, 0, 1);");
         return card;
+    }
+    private void handleLikeComment(Comment c) {
+        commentService.likeComment(c.getId(), Session.CURRENT_USER_ID);
+        renderComments();
+    }
+
+    private void handleDislikeComment(Comment c) {
+        commentService.dislikeComment(c.getId(), Session.CURRENT_USER_ID);
+        renderComments();
     }
 
     private void handleEditComment(Comment c) {

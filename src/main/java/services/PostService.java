@@ -132,4 +132,89 @@ public class PostService implements CrudService<Post> {
         }
         return null;
     }
+    public void likePost(int postId, int userId) {
+        try {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement removeDislike = connection.prepareStatement(
+                    "DELETE FROM post_dislikes WHERE post_id = ? AND user_id = ?")) {
+                removeDislike.setInt(1, postId);
+                removeDislike.setInt(2, userId);
+                removeDislike.executeUpdate();
+            }
+
+            try (PreparedStatement addLike = connection.prepareStatement(
+                    "INSERT IGNORE INTO post_likes (post_id, user_id) VALUES (?, ?)")) {
+                addLike.setInt(1, postId);
+                addLike.setInt(2, userId);
+                addLike.executeUpdate();
+            }
+
+            updateReactionCounters(postId);
+
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ignored) {
+            }
+            System.err.println("Error liking post: " + e.getMessage());
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    public void dislikePost(int postId, int userId) {
+        try {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement removeLike = connection.prepareStatement(
+                    "DELETE FROM post_likes WHERE post_id = ? AND user_id = ?")) {
+                removeLike.setInt(1, postId);
+                removeLike.setInt(2, userId);
+                removeLike.executeUpdate();
+            }
+
+            try (PreparedStatement addDislike = connection.prepareStatement(
+                    "INSERT IGNORE INTO post_dislikes (post_id, user_id) VALUES (?, ?)")) {
+                addDislike.setInt(1, postId);
+                addDislike.setInt(2, userId);
+                addDislike.executeUpdate();
+            }
+
+            updateReactionCounters(postId);
+
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ignored) {
+            }
+            System.err.println("Error disliking post: " + e.getMessage());
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ignored) {
+            }
+        }
+    }
+
+    private void updateReactionCounters(int postId) throws SQLException {
+        String query = """
+            UPDATE post
+            SET likes = (SELECT COUNT(*) FROM post_likes WHERE post_id = ?),
+                dislikes = (SELECT COUNT(*) FROM post_dislikes WHERE post_id = ?)
+            WHERE id = ?
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setInt(1, postId);
+            ps.setInt(2, postId);
+            ps.setInt(3, postId);
+            ps.executeUpdate();
+        }
+    }
 }

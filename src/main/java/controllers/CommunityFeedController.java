@@ -186,10 +186,14 @@ public class CommunityFeedController {
                 "-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0; " +
                 "-fx-background-radius: 12; -fx-border-radius: 12; " +
                 "-fx-padding: 4 12 4 12; -fx-font-size: 12;";
-        Label lblLikes    = new Label("👍 " + p.getLikes());
-        Label lblDislikes = new Label("👎 " + p.getDislikes());
-        lblLikes.setStyle(pillStyle);
-        lblDislikes.setStyle(pillStyle);
+        Button btnLike = new Button("👍 " + p.getLikes());
+        Button btnDislike = new Button("👎 " + p.getDislikes());
+
+        btnLike.setStyle(pillStyle + "-fx-cursor: hand;");
+        btnDislike.setStyle(pillStyle + "-fx-cursor: hand;");
+
+        btnLike.setOnAction(e -> handleLike(p));
+        btnDislike.setOnAction(e -> handleDislike(p));
 
         // Flag — visible to non-owners on posts that aren't already flagged
         Button btnFlag = new Button("🚩  Flag");
@@ -231,8 +235,8 @@ public class CommunityFeedController {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox row = new HBox(8, btnLike, btnDislike, spacer, btnFlag, btnEdit, btnDelete, btnDetail);
 
-        HBox row = new HBox(8, lblLikes, lblDislikes, spacer, btnFlag, btnEdit, btnDelete, btnDetail);
         row.setAlignment(Pos.CENTER_LEFT);
         return row;
     }
@@ -263,5 +267,14 @@ public class CommunityFeedController {
             postService.update(p);
             loadFeed();
         }
+    }
+    private void handleLike(Post p) {
+        postService.likePost(p.getId(), Session.CURRENT_USER_ID);
+        loadFeed();
+    }
+
+    private void handleDislike(Post p) {
+        postService.dislikePost(p.getId(), Session.CURRENT_USER_ID);
+        loadFeed();
     }
 }
