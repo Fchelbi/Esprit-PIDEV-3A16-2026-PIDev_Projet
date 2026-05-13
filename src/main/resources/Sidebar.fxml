@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.SidebarController"
+      prefWidth="240"
+      style="-fx-background-color: linear-gradient(to bottom, #3A5A90, #2E4A7A);">
+
+    <!-- ── Logo ── -->
+    <VBox alignment="CENTER" spacing="6" style="-fx-padding: 28 16 20 16;">
+        <!-- Two overlapping circles with white dots -->
+        <Pane prefWidth="50" prefHeight="32">
+            <Circle centerX="16" centerY="16" radius="16" fill="#4A6FA5"/>
+            <Circle centerX="34" centerY="16" radius="16" fill="#E8956D"/>
+            <Circle centerX="16" centerY="11" radius="3"  fill="white"/>
+            <Circle centerX="34" centerY="11" radius="3"  fill="white"/>
+        </Pane>
+        <Label text="EchoCare"
+               style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Label text="FORUM MODULE"
+               style="-fx-font-size: 10; -fx-text-fill: #E8956D; -fx-letter-spacing: 2;"/>
+    </VBox>
+
+    <!-- ── Search ── -->
+    <TextField promptText="🔍  Search..."
+               style="-fx-background-color: rgba(255,255,255,0.12);
+                      -fx-text-fill: white;
+                      -fx-prompt-text-fill: rgba(255,255,255,0.5);
+                      -fx-background-radius: 20;
+                      -fx-padding: 8 14 8 14;
+                      -fx-border-width: 0;">
+        <VBox.margin><Insets left="16" right="16" bottom="8"/></VBox.margin>
+    </TextField>
+
+    <!-- ── FORUM section ── -->
+    <Label text="FORUM"
+           style="-fx-text-fill: rgba(255,255,255,0.45); -fx-font-size: 9;
+                  -fx-letter-spacing: 2; -fx-padding: 12 0 8 20;"/>
+
+    <!-- Forum Admin -->
+    <HBox alignment="CENTER_LEFT">
+        <HBox fx:id="indicForumAdmin" prefWidth="4" minHeight="42"
+              style="-fx-background-color: transparent;"/>
+        <VBox fx:id="navForumAdmin" alignment="CENTER_LEFT"
+              onMouseClicked="#goForumAdmin"
+              style="-fx-padding: 10 16 10 12; -fx-cursor: hand;"
+              HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="💬" style="-fx-font-size: 14;"/>
+                <Label text="Forum Admin"
+                       style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 13;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- Moderation -->
+    <HBox alignment="CENTER_LEFT">
+        <HBox fx:id="indicModeration" prefWidth="4" minHeight="42"
+              style="-fx-background-color: transparent;"/>
+        <VBox fx:id="navModeration" alignment="CENTER_LEFT"
+              onMouseClicked="#goModeration"
+              style="-fx-padding: 10 16 10 12; -fx-cursor: hand;"
+              HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="🛡" style="-fx-font-size: 14;"/>
+                <Label text="Moderation"
+                       style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 13;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- Public Forum -->
+    <HBox alignment="CENTER_LEFT">
+        <HBox fx:id="indicPublicForum" prefWidth="4" minHeight="42"
+              style="-fx-background-color: transparent;"/>
+        <VBox fx:id="navPublicForum" alignment="CENTER_LEFT"
+              onMouseClicked="#goPublicForum"
+              style="-fx-padding: 10 16 10 12; -fx-cursor: hand;"
+              HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="📰" style="-fx-font-size: 14;"/>
+                <Label text="Public Forum"
+                       style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 13;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- New Post -->
+    <HBox alignment="CENTER_LEFT">
+        <HBox fx:id="indicNewPost" prefWidth="4" minHeight="42"
+              style="-fx-background-color: transparent;"/>
+        <VBox fx:id="navNewPost" alignment="CENTER_LEFT"
+              onMouseClicked="#goNewPost"
+              style="-fx-padding: 10 16 10 12; -fx-cursor: hand;"
+              HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="✚" style="-fx-font-size: 14; -fx-text-fill: #E8956D;"/>
+                <Label text="New Post"
+                       style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 13;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <!-- ── REPORTS section ── -->
+    <Label text="REPORTS"
+           style="-fx-text-fill: rgba(255,255,255,0.45); -fx-font-size: 9;
+                  -fx-letter-spacing: 2; -fx-padding: 20 0 8 20;"/>
+
+    <!-- Export PDF (orange-highlighted row) -->
+    <HBox alignment="CENTER_LEFT" onMouseClicked="#onExportPDF"
+          style="-fx-background-color: rgba(232,149,109,0.15); -fx-cursor: hand;">
+        <HBox prefWidth="4" minHeight="42" style="-fx-background-color: #E8956D;"/>
+        <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-padding: 10 16 10 12;">
+            <Label text="📄" style="-fx-font-size: 14;"/>
+            <Label text="Statistics"
+                   style="-fx-text-fill: #E8956D; -fx-font-size: 13;"/>
+        </HBox>
+    </HBox>
+
+    <!-- ── Spacer ── -->
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <!-- ── User pill ── -->
+    <HBox alignment="CENTER_LEFT"
+          style="-fx-background-color: rgba(0,0,0,0.2); -fx-padding: 14 16 14 16;">
+        <StackPane prefWidth="36" prefHeight="36">
+            <Circle radius="18" fill="#E8956D"/>
+            <Label fx:id="lblUserInitial"
+                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14;"/>
+        </StackPane>
+        <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <HBox.margin><Insets left="10"/></HBox.margin>
+            <Label fx:id="lblUserName"
+                   style="-fx-text-fill: white; -fx-font-size: 12;"/>
+            <Label fx:id="lblUserRole"
+                   style="-fx-text-fill: #E8956D; -fx-font-size: 9; -fx-letter-spacing: 1;"/>
+        </VBox>
+        <Button text="⎋" onAction="#onLogout"
+                style="-fx-background-color: transparent;
+                       -fx-text-fill: rgba(255,255,255,0.6);
+                       -fx-font-size: 16; -fx-cursor: hand;
+                       -fx-padding: 4 8 4 8;"/>
+    </HBox>
+
+</VBox>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.NewPostController"
+      minHeight="720">
+
+    <fx:include source="Sidebar.fxml"/>
+
+    <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent;
+                       -fx-border-color: transparent;">
+
+        <!-- Centering wrapper -->
+        <VBox alignment="TOP_CENTER"
+              style="-fx-background-color: #F2F0EC; -fx-padding: 35 30 35 30;">
+
+            <!-- White form card -->
+            <VBox maxWidth="640" spacing="20"
+                  style="-fx-background-color: white; -fx-background-radius: 14;
+                         -fx-padding: 32;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 3);">
+
+                <!-- Form title -->
+                <Label fx:id="lblFormTitle" text="Create new Post"
+                       style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+
+                <!-- Title field -->
+                <VBox spacing="6">
+                    <Label text="Title"
+                           style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <TextField fx:id="tfTitle"
+                               style="-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0;
+                                      -fx-border-radius: 8; -fx-background-radius: 8;
+                                      -fx-padding: 10 14 10 14;"/>
+                </VBox>
+
+                <!-- Content field -->
+                <VBox spacing="6">
+                    <Label text="Content"
+                           style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <TextArea fx:id="taContent" prefRowCount="6" wrapText="true"
+                              style="-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;
+                                     -fx-padding: 10 14 10 14;"/>
+                </VBox>
+
+                <!-- Photo field -->
+                <VBox spacing="6">
+                    <Label text="Post Photo (optional)"
+                           style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <HBox spacing="8">
+                        <TextField fx:id="tfPhotoPath" HBox.hgrow="ALWAYS"
+                                   promptText="No file chosen" editable="false"
+                                   style="-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 10 14 10 14;"/>
+                        <Button text="Choose file" onAction="#onChoosePhoto"
+                                style="-fx-background-color: #EDF2F7; -fx-text-fill: #4A5568;
+                                       -fx-border-color: #E2E8F0; -fx-border-radius: 8;
+                                       -fx-background-radius: 8; -fx-padding: 10 14 10 14;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Category field -->
+                <VBox spacing="6">
+                    <Label text="Category"
+                           style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <ComboBox fx:id="cbCategory" maxWidth="Infinity"
+                              style="-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;
+                                     -fx-padding: 4 0 4 0;"/>
+                </VBox>
+
+                <!-- Save button -->
+                <Button fx:id="btnSave" text="✔  Save" onAction="#onSave"
+                        maxWidth="Infinity"
+                        style="-fx-background-color: #E8956D; -fx-text-fill: white;
+                               -fx-background-radius: 10; -fx-padding: 13 22 13 22;
+                               -fx-font-weight: bold; -fx-font-size: 14; -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(232,149,109,0.55), 10, 0, 0, 3);"/>
+
+                <!-- Back link -->
+                <Button text="← Back" onAction="#onCancel"
+                        style="-fx-background-color: #EDF2F7; -fx-text-fill: #718096;
+                               -fx-background-radius: 8; -fx-padding: 8 16 8 16;
+                               -fx-cursor: hand;"/>
+
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+</HBox>

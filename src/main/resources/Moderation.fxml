@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ModerationController"
+      minHeight="720">
+
+    <fx:include source="Sidebar.fxml"/>
+
+    <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent;
+                       -fx-border-color: transparent;">
+
+        <VBox style="-fx-background-color: #F2F0EC;">
+
+            <!-- ── Header bar ── -->
+            <HBox alignment="CENTER_LEFT"
+                  style="-fx-background-color: white; -fx-padding: 22 30 22 30;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                <VBox spacing="2">
+                    <Label text="🛡 Moderation"
+                           style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <Label text="Review and act on user-generated content."
+                           style="-fx-font-size: 12; -fx-text-fill: #718096;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔄  Refresh" onAction="#onRefresh"
+                        style="-fx-background-color: white; -fx-text-fill: #4A5568;
+                               -fx-border-color: #E2E8F0; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-padding: 8 14 8 14;
+                               -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- ── Content area ── -->
+            <VBox spacing="22" style="-fx-padding: 25 30 35 30;">
+
+                <!-- Posts Management card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 14;
+                             -fx-padding: 22;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 2);">
+                    <Label text="📋  Posts Management"
+                           style="-fx-font-size: 16; -fx-font-weight: bold;
+                                  -fx-text-fill: #2D3748; -fx-padding: 0 0 14 0;"/>
+                    <TableView fx:id="tblPosts" prefHeight="320">
+                        <columns>
+                            <TableColumn fx:id="colPostId"       text="ID"       prefWidth="60"/>
+                            <TableColumn fx:id="colPostTitle"    text="TITLE"    prefWidth="240"/>
+                            <TableColumn fx:id="colPostAuthor"   text="AUTHOR"   prefWidth="110"/>
+                            <TableColumn fx:id="colPostCategory" text="CATEGORY" prefWidth="120"/>
+                            <TableColumn fx:id="colPostStatus"   text="STATUS"   prefWidth="110"/>
+                            <TableColumn fx:id="colPostDate"     text="DATE"     prefWidth="120"/>
+                            <TableColumn fx:id="colPostActions"  text="ACTIONS"  prefWidth="180"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <!-- Comments Management card -->
+                <VBox style="-fx-background-color: white; -fx-background-radius: 14;
+                             -fx-padding: 22;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 12, 0, 0, 2);">
+                    <Label text="💬  Comments Management"
+                           style="-fx-font-size: 16; -fx-font-weight: bold;
+                                  -fx-text-fill: #2D3748; -fx-padding: 0 0 14 0;"/>
+                    <TableView fx:id="tblComments" prefHeight="320">
+                        <columns>
+                            <TableColumn fx:id="colCommentId"      text="ID"      prefWidth="60"/>
+                            <TableColumn fx:id="colCommentContent"  text="CONTENT" prefWidth="280"/>
+                            <TableColumn fx:id="colCommentAuthor"   text="AUTHOR"  prefWidth="110"/>
+                            <TableColumn fx:id="colCommentRefPost"  text="POST"    prefWidth="220"/>
+                            <TableColumn fx:id="colCommentDate"     text="DATE"    prefWidth="120"/>
+                            <TableColumn fx:id="colCommentActions"  text="ACTIONS" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+</HBox>

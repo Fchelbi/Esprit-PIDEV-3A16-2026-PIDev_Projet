@@ -1,21 +1,25 @@
 package mains;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import utils.AppNavigator;
 
 public class MainFX extends Application {
 
     @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/posts.fxml"));
-        Scene scene = new Scene(loader.load(), 1100, 720);
-        scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+    public void start(Stage stage) {
+        Scene scene = new Scene(new Group(), 1280, 780);
+
         stage.setTitle("EchoCare Forum");
-        stage.setMinWidth(900);
-        stage.setMinHeight(600);
+        stage.setMinWidth(1100);
+        stage.setMinHeight(720);
         stage.setScene(scene);
+
+        AppNavigator.setPrimaryStage(stage);
+        AppNavigator.goTo("/CommunityFeed.fxml");
+
         stage.show();
     }
 
@@ -23,3 +27,4 @@ public class MainFX extends Application {
         launch(args);
     }
 }
+

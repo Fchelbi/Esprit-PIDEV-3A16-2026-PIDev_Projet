@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.CommunityFeedController"
+      minHeight="720">
+
+    <fx:include source="Sidebar.fxml"/>
+
+    <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS"
+                style="-fx-background-color: transparent; -fx-background: transparent;
+                       -fx-border-color: transparent;">
+
+        <VBox style="-fx-background-color: #F2F0EC;">
+
+            <!-- ── Header bar ── -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white; -fx-padding: 22 30 22 30;
+                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+                <VBox spacing="2">
+                    <Label text="Community Feed"
+                           style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                    <Label fx:id="lblPostCount" text="0 posts"
+                           style="-fx-font-size: 12; -fx-text-fill: #718096;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🔄  Refresh" onAction="#onRefresh"
+                        style="-fx-background-color: white; -fx-text-fill: #4A5568;
+                               -fx-border-color: #E2E8F0; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-padding: 8 14 8 14;
+                               -fx-cursor: hand;"/>
+                <Button text="✚  Create Post" onAction="#onCreatePost"
+                        style="-fx-background-color: #E8956D; -fx-text-fill: white;
+                               -fx-background-radius: 8; -fx-padding: 8 18 8 18;
+                               -fx-cursor: hand; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- ── Posts area (centered, max 900 px) ── -->
+            <VBox alignment="TOP_CENTER">
+                <VBox fx:id="postsContainer" maxWidth="900" spacing="16"
+                      style="-fx-padding: 25 30 25 30;"/>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+</HBox>
