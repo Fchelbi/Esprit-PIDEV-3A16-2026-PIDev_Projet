@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
@@ -30,17 +29,6 @@
         <Label text="FORUM MODULE"
                style="-fx-font-size: 10; -fx-text-fill: #E8956D; -fx-letter-spacing: 2;"/>
     </VBox>
-
-    <!-- ── Search ── -->
-    <TextField promptText="🔍  Search..."
-               style="-fx-background-color: rgba(255,255,255,0.12);
-                      -fx-text-fill: white;
-                      -fx-prompt-text-fill: rgba(255,255,255,0.5);
-                      -fx-background-radius: 20;
-                      -fx-padding: 8 14 8 14;
-                      -fx-border-width: 0;">
-        <VBox.margin><Insets left="16" right="16" bottom="8"/></VBox.margin>
-    </TextField>
 
     <!-- ── FORUM section ── -->
     <Label text="FORUM"

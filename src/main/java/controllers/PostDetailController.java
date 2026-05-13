@@ -10,6 +10,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -18,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import services.CommentService;
 import services.PostService;
+import utils.AppConfig;
 import utils.AppNavigator;
 import utils.CategoryCache;
 import utils.CategoryColor;
@@ -108,8 +111,56 @@ public class PostDetailController {
         lblContent.setWrapText(true);
 
         postBox.getChildren().addAll(header, lblTitle, lblContent);
+        buildPhoto(post).ifPresent(iv -> postBox.getChildren().add(iv));
     }
 
+    private Optional<ImageView> buildPhoto(Post p) {
+        String photo = p.getPhoto();
+
+        if (photo == null || photo.isBlank()) {
+            return Optional.empty();
+        }
+
+        if (photo.toLowerCase().endsWith(".avif")) {
+            return Optional.empty();
+        }
+
+        try {
+            String symfonyPublicPath = "C:/Users/user/OneDrive - ESPRIT/Bureau/emnaversion/public";
+
+            String cleanPhoto = photo.trim();
+
+            // Remove first slash only for clean path joining
+            if (cleanPhoto.startsWith("/")) {
+                cleanPhoto = cleanPhoto.substring(1);
+            }
+
+            java.io.File imageFile = new java.io.File(symfonyPublicPath, cleanPhoto);
+
+
+
+            if (!imageFile.exists()) {
+                return Optional.empty();
+            }
+
+            Image image = new Image(imageFile.toURI().toString());
+
+            if (image.isError()) {
+                System.err.println("[Photo] Failed to load: " + imageFile.getAbsolutePath() + " → " + image.getException());
+                return Optional.empty();
+            }
+
+            ImageView iv = new ImageView(image);
+            iv.setFitWidth(700);
+            iv.setPreserveRatio(true);
+
+            return Optional.of(iv);
+
+        } catch (Exception e) {
+            System.err.println("[Photo] Exception loading photo: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
     // ── Render comments ──────────────────────────────────────────────────────
 
     private void renderComments() {

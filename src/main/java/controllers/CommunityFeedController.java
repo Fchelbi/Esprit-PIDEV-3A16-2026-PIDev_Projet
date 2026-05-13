@@ -16,6 +16,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import services.PostService;
+import utils.AppConfig;
 import utils.AppNavigator;
 import utils.CategoryCache;
 import utils.CategoryColor;
@@ -136,17 +137,50 @@ public class CommunityFeedController {
 
     private Optional<ImageView> buildPhoto(Post p) {
         String photo = p.getPhoto();
-        if (photo == null || photo.isBlank()) return Optional.empty();
+
+        if (photo == null || photo.isBlank()) {
+            return Optional.empty();
+        }
+
+        if (photo.toLowerCase().endsWith(".avif")) {
+            return Optional.empty();
+        }
+
         try {
-            ImageView iv = new ImageView(new Image(photo, true));
+            String symfonyPublicPath = "C:/Users/user/OneDrive - ESPRIT/Bureau/emnaversion/public";
+
+            String cleanPhoto = photo.trim();
+
+            // Remove first slash only for clean path joining
+            if (cleanPhoto.startsWith("/")) {
+                cleanPhoto = cleanPhoto.substring(1);
+            }
+
+            java.io.File imageFile = new java.io.File(symfonyPublicPath, cleanPhoto);
+
+
+            if (!imageFile.exists()) {
+                return Optional.empty();
+            }
+
+            Image image = new Image(imageFile.toURI().toString());
+
+            if (image.isError()) {
+                System.err.println("[Photo] Failed to load: " + imageFile.getAbsolutePath() + " → " + image.getException());
+                return Optional.empty();
+            }
+
+            ImageView iv = new ImageView(image);
             iv.setFitWidth(600);
             iv.setPreserveRatio(true);
+
             return Optional.of(iv);
+
         } catch (Exception e) {
+            System.err.println("[Photo] Exception loading photo: " + e.getMessage());
             return Optional.empty();
         }
     }
-
     private HBox buildActionsRow(Post p) {
         String pillStyle =
                 "-fx-background-color: #F7FAFC; -fx-border-color: #E2E8F0; " +

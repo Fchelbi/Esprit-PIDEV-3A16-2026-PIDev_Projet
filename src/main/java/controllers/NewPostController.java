@@ -21,6 +21,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
 public class NewPostController {
 
     @FXML private Label            lblFormTitle;
@@ -34,6 +38,8 @@ public class NewPostController {
     private final CategoryService categoryService = new CategoryService();
 
     private Post editing = null;
+    private File selectedPhotoFile = null;
+
     private final Map<String, Integer> categoryNameToId = new LinkedHashMap<>();
 
     @FXML
@@ -72,22 +78,61 @@ public class NewPostController {
         FileChooser fc = new FileChooser();
         fc.setTitle("Choose Photo");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-                "Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp"));
+                "Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"
+        ));
+
         File file = fc.showOpenDialog(AppNavigator.getPrimaryStage());
+
         if (file != null) {
-            tfPhotoPath.setText(file.toURI().toString());
+            selectedPhotoFile = file;
+            tfPhotoPath.setText(file.getAbsolutePath());
         }
     }
+@FXML
+    private String copyPhotoToUploads(File sourceFile) throws IOException {
+        if (sourceFile == null) {
+            return null;
+        }
 
+        String uploadDirPath = "C:/Users/user/OneDrive - ESPRIT/Bureau/emnaversion/public/uploads/posts";
+
+        File uploadDir = new File(uploadDirPath);
+    if (!uploadDir.exists() && !uploadDir.mkdirs()) {
+        throw new IOException("Could not create upload directory: " + uploadDir.getAbsolutePath());
+    }
+
+        String originalName = sourceFile.getName();
+        String extension = "";
+
+        int dotIndex = originalName.lastIndexOf(".");
+        if (dotIndex >= 0) {
+            extension = originalName.substring(dotIndex);
+            originalName = originalName.substring(0, dotIndex);
+        }
+
+        String safeName = originalName.replaceAll("[^a-zA-Z0-9-_]", "-");
+        String newFileName = safeName + "-" + System.currentTimeMillis() + extension;
+
+        File destinationFile = new File(uploadDir, newFileName);
+
+        Files.copy(
+                sourceFile.toPath(),
+                destinationFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
+        return "/uploads/posts/" + newFileName;
+    }
     @FXML
     private void onSave() {
-        String title   = tfTitle.getText().trim();
+        String title = tfTitle.getText().trim();
         String content = taContent.getText().trim();
 
         if (title.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Title is required");
             return;
         }
+
         if (content.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Content is required");
             return;
@@ -95,6 +140,7 @@ public class NewPostController {
 
         String selectedName = cbCategory.getSelectionModel().getSelectedItem();
         int categoryId;
+
         if (selectedName != null && categoryNameToId.containsKey(selectedName)) {
             categoryId = categoryNameToId.get(selectedName);
         } else if (!categoryNameToId.isEmpty()) {
@@ -104,12 +150,22 @@ public class NewPostController {
             return;
         }
 
-        String photo = tfPhotoPath.getText().trim();
-
         try {
+            String photo = tfPhotoPath.getText().trim();
+
+            if (selectedPhotoFile != null) {
+                photo = copyPhotoToUploads(selectedPhotoFile);
+            }
+
             if (editing == null) {
-                Post newPost = new Post(categoryId, title, content,
-                                        LocalDateTime.now(), Session.CURRENT_USER_ID, photo);
+                Post newPost = new Post(
+                        categoryId,
+                        title,
+                        content,
+                        LocalDateTime.now(),
+                        Session.CURRENT_USER_ID,
+                        photo
+                );
                 postService.add(newPost);
             } else {
                 editing.setCategoryId(categoryId);
@@ -118,7 +174,9 @@ public class NewPostController {
                 editing.setPhoto(photo);
                 postService.update(editing);
             }
+
             AppNavigator.goTo("/CommunityFeed.fxml");
+
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Failed to save post: " + e.getMessage());
         }
