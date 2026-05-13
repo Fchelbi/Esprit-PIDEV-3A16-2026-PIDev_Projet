@@ -37,6 +37,11 @@
                                -fx-border-color: #E2E8F0; -fx-border-radius: 8;
                                -fx-background-radius: 8; -fx-padding: 8 14 8 14;
                                -fx-cursor: hand;"/>
+                <Button text="✨ Scan All Posts with DeepSeek"
+                        onAction="#onScanAllPostsWithAi"
+                        style="-fx-background-color: #E8956D; -fx-text-fill: white;
+               -fx-font-weight: bold; -fx-background-radius: 8;
+               -fx-padding: 8 16 8 16; -fx-cursor: hand;"/>
             </HBox>
 
             <!-- ── Content area ── -->

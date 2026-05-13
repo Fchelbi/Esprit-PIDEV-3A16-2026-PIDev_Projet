@@ -317,4 +317,21 @@ public class PostService implements CrudService<Post> {
 
         return data;
     }
+    public void updateModeration(int postId, boolean flagged, String status, String reason) {
+        String query = """
+            UPDATE post
+            SET is_flagged = ?, moderation_status = ?, flag_reason = ?
+            WHERE id = ?
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            ps.setBoolean(1, flagged);
+            ps.setString(2, status);
+            ps.setString(3, reason);
+            ps.setInt(4, postId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error updating moderation: " + e.getMessage());
+        }
+    }
 }

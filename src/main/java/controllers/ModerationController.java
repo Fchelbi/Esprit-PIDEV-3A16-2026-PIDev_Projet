@@ -23,6 +23,7 @@ import utils.CategoryColor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import services.DeepSeekService;
 
 public class ModerationController {
 
@@ -46,6 +47,7 @@ public class ModerationController {
 
     private final PostService    postService    = new PostService();
     private final CommentService commentService = new CommentService();
+    private final DeepSeekService deepSeekService = new DeepSeekService();
 
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("MMM d, yyyy");
@@ -74,6 +76,46 @@ public class ModerationController {
             tblComments.setItems(FXCollections.observableArrayList(commentService.getAll()));
         } catch (Exception e) {
             System.err.println("[Moderation] Failed to load comments: " + e.getMessage());
+        }
+    }
+    @FXML
+    private void onScanAllPostsWithAi() {
+        try {
+            for (Post post : postService.getAll()) {
+                DeepSeekService.ModerationResult result =
+                        deepSeekService.moderatePost(post.getTitle(), post.getContent());
+
+                if (result.flagged()) {
+                    postService.updateModeration(
+                            post.getId(),
+                            true,
+                            "flagged",
+                            result.reason()
+                    );
+                } else {
+                    postService.updateModeration(
+                            post.getId(),
+                            false,
+                            "approved",
+                            result.reason()
+                    );
+                }
+            }
+
+            reload();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("AI Moderation");
+            alert.setHeaderText(null);
+            alert.setContentText("DeepSeek AI scan completed.");
+            alert.showAndWait();
+
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("AI Moderation Error");
+            alert.setHeaderText(null);
+            alert.setContentText("DeepSeek scan failed:\n" + e.getMessage());
+            alert.showAndWait();
         }
     }
 
