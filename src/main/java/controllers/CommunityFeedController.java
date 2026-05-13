@@ -26,11 +26,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import services.GeminiService;
 
 public class CommunityFeedController {
 
     @FXML private VBox  postsContainer;
     @FXML private Label lblPostCount;
+    @FXML private Label lblAiAdvice;
+    private final GeminiService geminiService = new GeminiService();
 
     private final PostService postService = new PostService();
 
@@ -276,5 +279,16 @@ public class CommunityFeedController {
     private void handleDislike(Post p) {
         postService.dislikePost(p.getId(), Session.CURRENT_USER_ID);
         loadFeed();
+    }
+    @FXML
+    private void onGenerateAdvice() {
+        try {
+            lblAiAdvice.setText("Generating advice...");
+            String advice = geminiService.generateRandomAdvice();
+            lblAiAdvice.setText(advice);
+        } catch (Exception e) {
+            lblAiAdvice.setText("Could not generate advice right now.");
+            System.err.println("[Gemini Advice] " + e.getMessage());
+        }
     }
 }

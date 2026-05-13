@@ -19,7 +19,7 @@
 
         <VBox style="-fx-background-color: #F2F0EC;">
 
-            <!-- ── Header bar ── -->
+            <!-- Header bar -->
             <HBox alignment="CENTER_LEFT" spacing="12"
                   style="-fx-background-color: white; -fx-padding: 22 30 22 30;
                          -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
@@ -29,19 +29,44 @@
                     <Label fx:id="lblPostCount" text="0 posts"
                            style="-fx-font-size: 12; -fx-text-fill: #718096;"/>
                 </VBox>
+
                 <Region HBox.hgrow="ALWAYS"/>
+
                 <Button text="🔄  Refresh" onAction="#onRefresh"
                         style="-fx-background-color: white; -fx-text-fill: #4A5568;
                                -fx-border-color: #E2E8F0; -fx-border-radius: 8;
                                -fx-background-radius: 8; -fx-padding: 8 14 8 14;
                                -fx-cursor: hand;"/>
+
                 <Button text="✚  Create Post" onAction="#onCreatePost"
                         style="-fx-background-color: #E8956D; -fx-text-fill: white;
                                -fx-background-radius: 8; -fx-padding: 8 18 8 18;
                                -fx-cursor: hand; -fx-font-weight: bold;"/>
             </HBox>
 
-            <!-- ── Posts area (centered, max 900 px) ── -->
+            <!-- Gemini Advice box -->
+            <VBox alignment="TOP_CENTER" style="-fx-padding: 25 30 0 30;">
+                <VBox maxWidth="900"
+                      spacing="8"
+                      style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);">
+
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Label text="💡 Gemini Advice"
+                               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #3F6094;"/>
+
+                        <Button text="Generate"
+                                onAction="#onGenerateAdvice"
+                                style="-fx-background-color: #E8956D; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 6 12 6 12;"/>
+                    </HBox>
+
+                    <Label fx:id="lblAiAdvice"
+                           text="Click Generate to get a short supportive advice."
+                           wrapText="true"
+                           style="-fx-font-size: 13; -fx-text-fill: #4A5568;"/>
+                </VBox>
+            </VBox>
+
+            <!-- Posts area -->
             <VBox alignment="TOP_CENTER">
                 <VBox fx:id="postsContainer" maxWidth="900" spacing="16"
                       style="-fx-padding: 25 30 25 30;"/>
