@@ -10,6 +10,9 @@ import java.util.List;
 
 public class PostService implements CrudService<Post> {
 
+    public record DailyPostCount(String day, int count) {}
+    public record CategoryPostCount(String category, int count) {}
+
     private final Connection connection;
 
     public PostService() {
@@ -258,5 +261,60 @@ public class PostService implements CrudService<Post> {
         }
 
         return 0;
+    }
+    public List<DailyPostCount> getPostsActivityLast30Days() {
+        List<DailyPostCount> data = new ArrayList<>();
+
+        String query = """
+            SELECT DATE(created_at) AS day, COUNT(*) AS total
+            FROM post
+            WHERE created_at >= CURDATE() - INTERVAL 30 DAY
+            GROUP BY DATE(created_at)
+            ORDER BY day
+            """;
+
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            while (rs.next()) {
+                data.add(new DailyPostCount(
+                        rs.getString("day"),
+                        rs.getInt("total")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[Stats] Error loading posts activity: " + e.getMessage());
+        }
+
+        return data;
+    }
+
+    public List<CategoryPostCount> getPostsByCategory() {
+        List<CategoryPostCount> data = new ArrayList<>();
+
+        String query = """
+            SELECT c.name AS category_name, COUNT(p.id) AS total
+            FROM category c
+            LEFT JOIN post p ON p.category_id = c.id
+            GROUP BY c.id, c.name
+            ORDER BY total DESC
+            """;
+
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
+
+            while (rs.next()) {
+                data.add(new CategoryPostCount(
+                        rs.getString("category_name"),
+                        rs.getInt("total")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[Stats] Error loading posts by category: " + e.getMessage());
+        }
+
+        return data;
     }
 }

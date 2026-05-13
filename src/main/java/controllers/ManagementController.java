@@ -5,6 +5,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import services.CommentService;
 import services.PostService;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 
 public class ManagementController {
 
@@ -18,12 +21,17 @@ public class ManagementController {
     @FXML private Label lblCommentLikes;
     @FXML private Label lblCommentDislikes;
 
+    @FXML private LineChart<String, Number> postsActivityChart;
+    @FXML private PieChart postsByCategoryChart;
+
     private final PostService postService = new PostService();
     private final CommentService commentService = new CommentService();
 
     @FXML
     public void initialize() {
         loadStats();
+        loadPostsActivityChart();
+        loadPostsByCategoryChart();
     }
 
     private void loadStats() {
@@ -36,6 +44,30 @@ public class ManagementController {
         lblPostDislikes.setText(String.valueOf(postService.totalPostDislikes()));
         lblCommentLikes.setText(String.valueOf(commentService.totalCommentLikes()));
         lblCommentDislikes.setText(String.valueOf(commentService.totalCommentDislikes()));
+    }
+    private void loadPostsActivityChart() {
+        postsActivityChart.getData().clear();
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Posts");
+
+        for (PostService.DailyPostCount item : postService.getPostsActivityLast30Days()) {
+            series.getData().add(new XYChart.Data<>(item.day(), item.count()));
+        }
+
+        postsActivityChart.getData().add(series);
+    }
+
+    private void loadPostsByCategoryChart() {
+        postsByCategoryChart.getData().clear();
+
+        for (PostService.CategoryPostCount item : postService.getPostsByCategory()) {
+            if (item.count() > 0) {
+                postsByCategoryChart.getData().add(
+                        new PieChart.Data(item.category(), item.count())
+                );
+            }
+        }
     }
 
     @FXML
