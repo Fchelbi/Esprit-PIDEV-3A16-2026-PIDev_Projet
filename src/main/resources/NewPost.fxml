@@ -32,6 +32,9 @@
                 <!-- Form title -->
                 <Label fx:id="lblFormTitle" text="Create new Post"
                        style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2D3748;"/>
+                <Button text="✨ Generate with Gemini"
+                        onAction="#onGenerateWithAi"
+                        style="-fx-background-color: #3F6094; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 14 8 14;"/>
 
                 <!-- Title field -->
                 <VBox spacing="6">

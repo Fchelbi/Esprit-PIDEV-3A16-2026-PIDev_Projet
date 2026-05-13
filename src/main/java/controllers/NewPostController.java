@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import javafx.scene.control.TextInputDialog;
+import services.GeminiService;
+
 public class NewPostController {
 
     @FXML private Label            lblFormTitle;
@@ -36,6 +39,7 @@ public class NewPostController {
 
     private final PostService     postService     = new PostService();
     private final CategoryService categoryService = new CategoryService();
+    private final GeminiService geminiService = new GeminiService();
 
     private Post editing = null;
     private File selectedPhotoFile = null;
@@ -123,6 +127,60 @@ public class NewPostController {
 
         return "/uploads/posts/" + newFileName;
     }
+    @FXML
+    private void onGenerateWithAi() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Generate Post with Gemini");
+        dialog.setHeaderText("What should the post be about?");
+        dialog.setContentText("Topic:");
+
+        dialog.showAndWait().ifPresent(topic -> {
+            String cleanedTopic = topic.trim();
+
+            if (cleanedTopic.isEmpty()) {
+                return;
+            }
+
+            try {
+                String aiText = geminiService.generateForumPost(cleanedTopic);
+                String title = "";
+                String content = "";
+
+                String[] lines = aiText.split("\\R");
+                boolean readingContent = false;
+
+                for (String line : lines) {
+                    String trimmed = line.trim();
+
+                    if (trimmed.toLowerCase().startsWith("title:")) {
+                        title = trimmed.substring(6).trim();
+                        readingContent = false;
+                    } else if (trimmed.toLowerCase().startsWith("content:")) {
+                        content = trimmed.substring(8).trim();
+                        readingContent = true;
+                    } else if (readingContent) {
+                        content += "\n" + trimmed;
+                    }
+                }
+
+                if (!title.isBlank()) {
+                    tfTitle.setText(title);
+                }
+
+                if (!content.isBlank()) {
+                    taContent.setText(content.trim());
+                } else {
+                    taContent.setText(aiText.trim());
+                }
+
+
+
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Gemini generation failed: " + e.getMessage());
+            }
+        });
+    }
+
     @FXML
     private void onSave() {
         String title = tfTitle.getText().trim();
