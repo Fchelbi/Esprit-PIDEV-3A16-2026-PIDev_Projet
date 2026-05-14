@@ -89,6 +89,7 @@
             <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
+
         <!-- BCrypt (compatible Symfony passwords) -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -96,6 +97,20 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- ══════════════════════════════════════════════════════
+             VLCJ — plays YouTube and local videos inside the app
+             Requires VLC installed at /Applications/VLC.app
+             ══════════════════════════════════════════════════════ -->
+        <dependency>
+            <groupId>uk.co.caprica</groupId>
+            <artifactId>vlcj</artifactId>
+            <version>4.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.co.caprica</groupId>
+            <artifactId>vlcj-javafx</artifactId>
+            <version>1.2.0</version>
+        </dependency>
 
     </dependencies>
 
@@ -108,8 +123,13 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>mains.MainFX</mainClass>
+                    <!-- VM option so VLC native library loads on Mac M4 -->
+                    <options>
+                        <option>-Djna.library.path=/Applications/VLC.app/Contents/MacOS/lib</option>
+                    </options>
                 </configuration>
             </plugin>
+
             <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
