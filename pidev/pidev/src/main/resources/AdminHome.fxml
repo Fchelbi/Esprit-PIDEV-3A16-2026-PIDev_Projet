@@ -105,6 +105,48 @@
                 </HBox>
             </VBox>
         </HBox>
+        <!-- Forum Admin -->
+        <HBox alignment="CENTER_LEFT" spacing="0">
+            <HBox fx:id="indicForumAdmin" prefWidth="4" prefHeight="42"
+                  style="-fx-min-width:4;-fx-max-width:4;-fx-background-color:transparent;-fx-background-radius:0 2 2 0;"/>
+            <VBox fx:id="navForumAdmin" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT"
+                  style="-fx-padding:12 20 12 16;-fx-cursor:hand;-fx-background-color:transparent;-fx-background-radius:0 10 10 0;"
+                  onMouseClicked="#showForumAdmin" onMouseEntered="#onNavForumAdminEnter" onMouseExited="#onNavForumAdminExit">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="💬" style="-fx-font-size:16px;"/>
+                    <Label text="Forum Admin" style="-fx-text-fill:rgba(255,255,255,0.75);-fx-font-size:13px;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- Moderation -->
+        <HBox alignment="CENTER_LEFT" spacing="0">
+            <HBox fx:id="indicModeration" prefWidth="4" prefHeight="42"
+                  style="-fx-min-width:4;-fx-max-width:4;-fx-background-color:transparent;-fx-background-radius:0 2 2 0;"/>
+            <VBox fx:id="navModeration" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT"
+                  style="-fx-padding:12 20 12 16;-fx-cursor:hand;-fx-background-color:transparent;-fx-background-radius:0 10 10 0;"
+                  onMouseClicked="#showModeration" onMouseEntered="#onNavModerationEnter" onMouseExited="#onNavModerationExit">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="🛡" style="-fx-font-size:16px;"/>
+                    <Label text="Moderation" style="-fx-text-fill:rgba(255,255,255,0.75);-fx-font-size:13px;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- Public Forum -->
+        <HBox alignment="CENTER_LEFT" spacing="0">
+            <HBox fx:id="indicPublicForum" prefWidth="4" prefHeight="42"
+                  style="-fx-min-width:4;-fx-max-width:4;-fx-background-color:transparent;-fx-background-radius:0 2 2 0;"/>
+            <VBox fx:id="navPublicForum" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT"
+                  style="-fx-padding:12 20 12 16;-fx-cursor:hand;-fx-background-color:transparent;-fx-background-radius:0 10 10 0;"
+                  onMouseClicked="#showPublicForum" onMouseEntered="#onNavPublicForumEnter" onMouseExited="#onNavPublicForumExit">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="📰" style="-fx-font-size:16px;"/>
+                    <Label text="Public Forum" style="-fx-text-fill:rgba(255,255,255,0.75);-fx-font-size:13px;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
 
         <Region VBox.vgrow="ALWAYS"/>
         <VBox spacing="10" style="-fx-padding:15;-fx-border-color:rgba(255,255,255,0.1) transparent transparent transparent;-fx-border-width:1;">

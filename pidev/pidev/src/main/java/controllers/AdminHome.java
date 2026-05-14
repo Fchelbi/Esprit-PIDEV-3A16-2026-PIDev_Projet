@@ -43,6 +43,8 @@ public class AdminHome {
     @FXML private ImageView imgHeaderPhoto;
     @FXML private VBox navDashboard, navUtilisateurs, navFormations, navProfil;
     @FXML private HBox indicDashboard, indicUtilisateurs, indicFormations, indicProfil;
+    @FXML private VBox navForumAdmin, navModeration, navPublicForum;
+    @FXML private HBox indicForumAdmin, indicModeration, indicPublicForum;
 
     // ── Services ──────────────────────────────────────────────────────────
     private final serviceUser us = new serviceUser();
@@ -498,6 +500,32 @@ public class AdminHome {
             contentArea.getChildren().setAll(page);
         } catch (IOException e) { e.printStackTrace(); LightDialog.showError("Erreur", "Chargement Profil impossible."); }
     }
+    @FXML void showForumAdmin(MouseEvent event) {
+        try {
+            setActiveNav(navForumAdmin, indicForumAdmin);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Management.fxml"));
+            Parent page = loader.load();
+            contentArea.getChildren().setAll(page);
+        } catch (IOException e) { e.printStackTrace(); LightDialog.showError("Erreur", "Chargement Forum Admin impossible."); }
+    }
+
+    @FXML void showModeration(MouseEvent event) {
+        try {
+            setActiveNav(navModeration, indicModeration);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Moderation.fxml"));
+            Parent page = loader.load();
+            contentArea.getChildren().setAll(page);
+        } catch (IOException e) { e.printStackTrace(); LightDialog.showError("Erreur", "Chargement Moderation impossible."); }
+    }
+
+    @FXML void showPublicForum(MouseEvent event) {
+        try {
+            setActiveNav(navPublicForum, indicPublicForum);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/CommunityFeed.fxml"));
+            Parent page = loader.load();
+            contentArea.getChildren().setAll(page);
+        } catch (IOException e) { e.printStackTrace(); LightDialog.showError("Erreur", "Chargement Public Forum impossible."); }
+    }
 
     // ════════════════════════════════════════════════════════════════════
     //  HOVER HANDLERS
@@ -511,7 +539,12 @@ public class AdminHome {
     @FXML void onNavFormationsExit(MouseEvent e)  { if (navFormations   != currentActiveNav) navFormations.setStyle(NAV_NORMAL); }
     @FXML void onNavProfilEnter(MouseEvent e)     { if (navProfil       != currentActiveNav) navProfil.setStyle(NAV_ACTIVE); }
     @FXML void onNavProfilExit(MouseEvent e)      { if (navProfil       != currentActiveNav) navProfil.setStyle(NAV_NORMAL); }
-
+    @FXML void onNavForumAdminEnter(MouseEvent e)   { if (navForumAdmin   != currentActiveNav) navForumAdmin.setStyle(NAV_ACTIVE); }
+    @FXML void onNavForumAdminExit(MouseEvent e)    { if (navForumAdmin   != currentActiveNav) navForumAdmin.setStyle(NAV_NORMAL); }
+    @FXML void onNavModerationEnter(MouseEvent e)   { if (navModeration   != currentActiveNav) navModeration.setStyle(NAV_ACTIVE); }
+    @FXML void onNavModerationExit(MouseEvent e)    { if (navModeration   != currentActiveNav) navModeration.setStyle(NAV_NORMAL); }
+    @FXML void onNavPublicForumEnter(MouseEvent e)  { if (navPublicForum  != currentActiveNav) navPublicForum.setStyle(NAV_ACTIVE); }
+    @FXML void onNavPublicForumExit(MouseEvent e)   { if (navPublicForum  != currentActiveNav) navPublicForum.setStyle(NAV_NORMAL); }
     // ════════════════════════════════════════════════════════════════════
     //  HELPERS
     // ════════════════════════════════════════════════════════════════════
@@ -523,8 +556,10 @@ public class AdminHome {
     }
 
     private void setActiveNav(VBox nav, HBox indic) {
-        VBox[] navs   = {navDashboard, navUtilisateurs, navFormations, navProfil};
-        HBox[] indics = {indicDashboard, indicUtilisateurs, indicFormations, indicProfil};
+        VBox[] navs   = {navDashboard, navUtilisateurs, navFormations, navProfil,
+                navForumAdmin, navModeration, navPublicForum};
+        HBox[] indics = {indicDashboard, indicUtilisateurs, indicFormations, indicProfil,
+                indicForumAdmin, indicModeration, indicPublicForum};
         for (VBox n : navs)   if (n != null) n.setStyle(NAV_NORMAL);
         for (HBox i : indics) if (i != null) i.setStyle(INDIC_HIDDEN);
         if (nav   != null) nav.setStyle(NAV_ACTIVE);

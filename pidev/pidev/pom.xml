@@ -111,6 +111,18 @@
             <artifactId>vlcj-javafx</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <!-- OpenPDF for PDF export (com.lowagie.text.*) -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>1.3.30</version>
+        </dependency>
+        <!-- Google Gemini Java SDK -->
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>0.4.0</version>
+        </dependency>
 
     </dependencies>
 
